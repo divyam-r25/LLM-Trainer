@@ -380,7 +380,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 ml-[20px] mr-[20px] pl-[20px] pr-[20px]">
                 <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow" onClick={handleGetStarted} data-testid="button-start-trial">
                   <Rocket className="w-5 h-5 mr-2" />
                   Start Free Trial
