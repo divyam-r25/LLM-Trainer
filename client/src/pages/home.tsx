@@ -392,7 +392,7 @@ export default function Home() {
                 </Button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm">
+              <div className="flex flex-wrap items-center gap-6 text-sm ml-[20px] mr-[20px] pl-[10px] pr-[10px]">
                 <div className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
                   <Check className="w-4 h-4 text-primary" />
                   <span className="font-medium">No credit card required</span>
