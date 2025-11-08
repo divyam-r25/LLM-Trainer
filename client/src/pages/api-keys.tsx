@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Key, Plus, Copy, Check, Trash2, RefreshCw, Power } from "lucide-react";
+import { Key, Plus, Copy, Check, Trash2, RefreshCw, Power, Code } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { ApiKey, Persona, InsertApiKey } from "@shared/schema";
@@ -15,6 +15,8 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CodeBlock } from "@/components/code-block";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ApiKeys() {
   const { toast } = useToast();
@@ -135,6 +137,46 @@ export default function ApiKeys() {
     });
   };
 
+  const baseUrl = window.location.origin;
+
+  const curlExample = `curl -X POST ${baseUrl}/api/v1/chat/YOUR_PERSONA_ID \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "message": "Hello, how can you help me?"
+  }'`;
+
+  const jsExample = `const response = await fetch('${baseUrl}/api/v1/chat/YOUR_PERSONA_ID', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    message: 'Hello, how can you help me?'
+  })
+});
+
+const data = await response.json();
+console.log(data.message); // AI response
+console.log(data.tokensUsed); // Tokens consumed`;
+
+  const pythonExample = `import requests
+
+url = "${baseUrl}/api/v1/chat/YOUR_PERSONA_ID"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+data = {
+    "message": "Hello, how can you help me?"
+}
+
+response = requests.post(url, json=data, headers=headers)
+result = response.json()
+print(result["message"])
+print(f"Tokens used: {result['tokensUsed']}")`;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -206,6 +248,87 @@ export default function ApiKeys() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Code className="w-5 h-5" />
+            <CardTitle>How to Use Your API Keys</CardTitle>
+          </div>
+          <CardDescription>
+            API endpoint format and integration examples
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold mb-2">Endpoint Format</h3>
+              <div className="p-4 rounded-md bg-muted border border-border">
+                <code className="text-sm font-mono break-all">
+                  POST {baseUrl}/api/v1/chat/&#123;PERSONA_ID&#125;
+                </code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Authentication</h3>
+              <div className="p-4 rounded-md bg-muted border border-border">
+                <code className="text-sm font-mono">
+                  Authorization: Bearer YOUR_API_KEY
+                </code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Request Format</h3>
+              <CodeBlock
+                code={`{
+  "message": "Your message to the AI persona"
+}`}
+                language="json"
+              />
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Response Format</h3>
+              <CodeBlock
+                code={`{
+  "message": "The AI persona's response",
+  "tokensUsed": 42
+}`}
+                language="json"
+              />
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Integration Examples</h3>
+            <Tabs defaultValue="curl" className="w-full">
+              <TabsList className="w-full justify-start">
+                <TabsTrigger value="curl">cURL</TabsTrigger>
+                <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+                <TabsTrigger value="python">Python</TabsTrigger>
+              </TabsList>
+              <TabsContent value="curl" className="mt-4">
+                <CodeBlock code={curlExample} language="bash" />
+              </TabsContent>
+              <TabsContent value="javascript" className="mt-4">
+                <CodeBlock code={jsExample} language="javascript" />
+              </TabsContent>
+              <TabsContent value="python" className="mt-4">
+                <CodeBlock code={pythonExample} language="python" />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <Alert>
+            <Key className="w-4 h-4" />
+            <AlertDescription>
+              <strong>Important:</strong> Replace YOUR_PERSONA_ID with your persona's ID (found in the Deploy page) and YOUR_API_KEY with an API key from the table below. Rate limit: 60 requests/minute per key.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
 
       <Dialog open={showKeyDialog} onOpenChange={setShowKeyDialog}>
         <DialogContent>
