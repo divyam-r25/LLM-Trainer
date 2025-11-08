@@ -341,50 +341,116 @@ export default function Home() {
         </div>
       </nav>
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative pt-32 pb-20 px-6 lg:px-8 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 -z-10">
+          {/* Gradient Orbs */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float-delayed"></div>
+          
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]"></div>
+          
+          {/* Animated Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 animate-gradient"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column */}
             <div className="space-y-8">
-              <div className="space-y-4">
-                <Badge variant="secondary" className="w-fit" data-testid="badge-hero">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  No Fine-Tuning Required
+              <div className="space-y-6">
+                <Badge variant="secondary" className="w-fit border border-primary/20 bg-primary/5 hover-elevate" data-testid="badge-hero">
+                  <Sparkles className="w-3 h-3 mr-1 text-primary" />
+                  <span className="font-medium">No Fine-Tuning Required</span>
                 </Badge>
-                <h1 className="text-5xl lg:text-6xl font-bold leading-tight" data-testid="text-hero-title">
-                  Train. Test. Deploy custom AI personas — in minutes.
+                
+                <h1 className="text-5xl lg:text-7xl font-bold leading-tight" data-testid="text-hero-title">
+                  <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+                    Train. Test. Deploy
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    custom AI personas
+                  </span>
+                  <br />
+                  <span className="text-foreground">— in minutes.</span>
                 </h1>
-                <p className="text-xl text-muted-foreground" data-testid="text-hero-subtitle">
+                
+                <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-xl" data-testid="text-hero-subtitle">
                   ForgeAI lets you build specialized AI assistants for your business or app — no fine-tuning required.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" onClick={handleGetStarted} data-testid="button-start-trial">
+                <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow" onClick={handleGetStarted} data-testid="button-start-trial">
+                  <Rocket className="w-5 h-5 mr-2" />
                   Start Free Trial
-                  <ChevronRight className="w-4 h-4 ml-2" />
+                  <ChevronRight className="w-5 h-5 ml-2" />
                 </Button>
-                <Button size="lg" variant="outline" onClick={scrollToTrial} data-testid="button-view-demo">
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2" onClick={scrollToTrial} data-testid="button-view-demo">
+                  <Zap className="w-5 h-5 mr-2" />
                   View Demo
                 </Button>
               </div>
 
-              <div className="flex items-center gap-8 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-6 text-sm">
+                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
                   <Check className="w-4 h-4 text-primary" />
-                  <span>No credit card required</span>
+                  <span className="font-medium">No credit card required</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  <span>Deploy in 5 minutes</span>
+                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span className="font-medium">Deploy in 5 minutes</span>
                 </div>
               </div>
             </div>
 
             {/* Right Column - Visual Element */}
-            <div className="relative flex items-center justify-center h-96">
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10"></div>
-              <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+            <div className="relative flex items-center justify-center h-96 lg:h-[500px]">
+              {/* Floating Cards Animation */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative w-full h-full">
+                  {/* Card 1 */}
+                  <div className="absolute top-0 left-1/4 w-48 h-32 bg-card border border-border rounded-lg p-4 shadow-xl animate-float-card-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Brain className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-semibold">AI Persona</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="h-2 bg-primary/20 rounded w-3/4"></div>
+                      <div className="h-2 bg-muted rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Card 2 */}
+                  <div className="absolute top-1/3 right-1/4 w-40 h-28 bg-card border border-border rounded-lg p-3 shadow-xl animate-float-card-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Code2 className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-semibold">API Ready</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="h-2 bg-primary/20 rounded w-full"></div>
+                      <div className="h-2 bg-muted rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Card 3 */}
+                  <div className="absolute bottom-1/4 left-1/3 w-44 h-30 bg-card border border-border rounded-lg p-3 shadow-xl animate-float-card-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BarChart3 className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-semibold">Analytics</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="h-2 bg-primary/20 rounded w-5/6"></div>
+                      <div className="h-2 bg-muted rounded w-3/5"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Glow Effects */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse-slow"></div>
             </div>
           </div>
         </div>
