@@ -1,0 +1,216 @@
+Enhance the existing ForgeAI platform by adding two new pages — Create Persona and Chat Sandbox.
+Do not modify or redesign the current Dashboard, Analytics, or API Keys pages.
+Only extend functionality with the new routes, components, and backend endpoints to make the persona creation and testing fully operational and responsive.
+
+1️⃣ Create Persona Page
+
+Path: /create
+
+Purpose:
+Allow users to create or edit a new AI persona with name, intent, description, and example dialogues.
+After saving, the persona should be stored in the database and redirect to the Chat Sandbox for testing.
+
+Frontend Requirements
+
+Form Fields:
+
+Persona Name (text input)
+
+Description (textarea)
+
+Intent (textarea with placeholder like “Define what this persona should do…”)
+
+Few-Shot Examples (dynamic field pairs → “User Message” and “AI Response”)
+
+Buttons:
+
+Save Persona → Saves data to backend via POST /api/trainers
+
+Simulate Training → Calls /api/trainers/simulate to preview generated system prompt
+
+Clear Form → Resets all fields
+
+Behavior:
+
+After saving → Redirect user to /chat/:id for that persona.
+
+Show loading spinner during save.
+
+Show success/error toast messages.
+
+Form should be fully responsive (2-column layout on desktop, stacked on mobile).
+
+Validation:
+
+Persona Name and Intent are required fields.
+
+Prevent empty submission.
+
+Backend Requirements
+
+Endpoints to Implement / Verify:
+
+POST /api/trainers
+→ Creates a new persona with fields: name, description, intent, examples, user_id.
+
+PUT /api/trainers/{id}
+→ Edits existing persona (if editing support added later).
+
+POST /api/trainers/simulate
+→ Returns an “Adaptive Prompt” preview based on provided intent and few-shot examples.
+
+GET /api/trainers/{id}
+→ Fetch persona details for edit or chat testing.
+
+Data Model Example:
+
+{
+  "id": "uuid",
+  "name": "SupportBot Pro",
+  "description": "Helps users solve issues politely",
+  "intent": "Assist customers with order issues",
+  "examples": [
+    {"user": "My order hasn’t arrived.", "assistant": "I understand. Could you share your order ID?"}
+  ],
+  "created_at": "...",
+  "updated_at": "...",
+  "user_id": "..."
+}
+
+2️⃣ Chat Sandbox Page
+
+Path: /chat/:id
+
+Purpose:
+Allow users to test their trained persona in a live chat interface, viewing responses in Markdown format and persisting history.
+
+Frontend Requirements
+
+Layout:
+
+Left sidebar (optional): Persona info (name, description, version, tokens used)
+
+Center chat area:
+
+Scrollable message history
+
+Messages styled differently for user vs. assistant
+
+Bottom input box:
+
+Text input for user message
+
+“Send” button
+
+“Clear Chat” button
+
+Behavior:
+
+On page load → Fetch persona details (GET /api/trainers/{id})
+
+On sending message → Call /api/chat/{id} with { message }
+
+Display AI response dynamically with typing animation.
+
+Save conversation persistently (reload should restore past chat).
+
+Features:
+
+Markdown rendering with react-markdown + remark-gfm
+
+Token counter (optional small footer below chat)
+
+Chat history automatically scrolls to latest message
+
+Responsive design (full width on mobile, two-column on large screens)
+
+Graceful empty state (“Start chatting with your persona”)
+
+Backend Requirements
+
+Endpoints to Implement:
+
+POST /api/chat/{persona_id}
+
+Accepts { message: string, session_id?: string }
+
+Retrieves persona’s system prompt + few-shot examples
+
+Calls OpenAI API (gpt-4o-mini or similar)
+
+Returns:
+
+{
+  "response": "AI’s reply text",
+  "tokens_used": 124,
+  "message_id": "uuid"
+}
+
+
+Saves conversation to DB under that persona’s ID.
+
+GET /api/chat/history/{persona_id}
+
+Returns stored messages in chronological order (for restoring chat).
+
+DELETE /api/chat/history/{persona_id}
+
+Clears stored chat history for that persona (for “Clear Chat” button).
+
+Data Model Example:
+{
+  "persona_id": "uuid",
+  "messages": [
+    {"role": "user", "content": "Hi!"},
+    {"role": "assistant", "content": "Hello! How can I help you today?"}
+  ],
+  "timestamp": "2025-11-08T12:00:00Z"
+}
+
+3️⃣ Common Requirements
+
+Both pages must be fully responsive (mobile, tablet, desktop).
+
+Match the existing ForgeAI dashboard design:
+
+Same sidebar, top navigation, and color scheme.
+
+Use Inter + JetBrains Mono fonts.
+
+Use rounded cards, white surfaces, and clean spacing (p-6, shadow-md).
+
+Integrate both pages into the same React Router setup.
+
+Add links:
+
+“+ New Persona” → /create
+
+In persona cards → “Test” → /chat/:id
+
+4️⃣ Design Palette
+
+Keep identical to the existing dashboard:
+
+Primary Blue: #2563EB
+
+Secondary: #1E40AF
+
+Background: #F9FAFB
+
+Text: #0F172A
+
+Surface: #FFFFFF
+
+Border: #E5E7EB
+
+5️⃣ Deliverables
+
+✅ Working Create Persona page integrated with backend
+✅ Working Chat Sandbox page integrated with backend
+✅ Chat persistence and markdown rendering
+✅ No existing dashboard pages altered
+✅ Fully responsive layout for all new components
+✅ API endpoints tested and returning correct data
+
+Priority: 🔥 High
+Goal: Add only Create Persona and Chat Sandbox pages to the existing ForgeAI dashboard — both fully functional, connected to backend, and responsive.
