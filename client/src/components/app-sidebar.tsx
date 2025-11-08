@@ -1,4 +1,4 @@
-import { Home, Sparkles, BarChart3, Key, Settings, LogOut, User as UserIcon } from "lucide-react";
+import { Home, Sparkles, BarChart3, Key, Settings, LogOut, User as UserIcon, Plus, MessageSquare } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -24,12 +24,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { queryClient } from "@/lib/queryClient";
 import logoImage from "@assets/8bfed827-52ba-46fb-8296-0158062c5b28_1762612473771.jpg";
+import { useQuery } from "@tanstack/react-query";
+import type { Persona } from "@shared/schema";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const menuItems = [
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
+  },
+  {
+    title: "Create Persona",
+    url: "/create",
+    icon: Plus,
   },
   {
     title: "Analytics",
@@ -46,6 +54,11 @@ const menuItems = [
 export function AppSidebar() {
   const [location] = useLocation();
   const { user, isAuthenticated } = useAuth();
+
+  const { data: personas = [] } = useQuery<Persona[]>({
+    queryKey: ["/api/personas"],
+    enabled: isAuthenticated,
+  });
 
   const handleLogout = async () => {
     try {
@@ -88,7 +101,7 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={location === item.url}>
-                    <Link href={item.url} data-testid={`link-${item.title.toLowerCase()}`}>
+                    <Link href={item.url} data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}>
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -98,6 +111,33 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isAuthenticated && personas.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>My Personas</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <ScrollArea className="h-[300px]">
+                <SidebarMenu>
+                  {personas.slice(0, 10).map((persona) => (
+                    <SidebarMenuItem key={persona.id}>
+                      <SidebarMenuButton asChild isActive={location === `/chat/${persona.id}`}>
+                        <Link href={`/chat/${persona.id}`} data-testid={`link-persona-${persona.id}`}>
+                          <MessageSquare className="w-4 h-4" />
+                          <span className="truncate">{persona.name}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </ScrollArea>
+              {personas.length > 10 && (
+                <div className="px-3 py-2 text-xs text-muted-foreground">
+                  +{personas.length - 10} more in dashboard
+                </div>
+              )}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       {isAuthenticated && user && (
         <SidebarFooter className="p-4 border-t border-sidebar-border">
