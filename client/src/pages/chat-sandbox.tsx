@@ -201,70 +201,71 @@ export default function ChatSandbox() {
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[500px] p-6">
-              {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center py-12" data-testid="container-empty-chat">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Bot className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Start a conversation</h3>
-                  <p className="text-sm text-muted-foreground max-w-sm">
-                    Test your persona by sending messages. The AI will respond based on your training.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex gap-3 ${
-                        message.role === "user" ? "justify-end" : "justify-start"
-                      }`}
-                      data-testid={`message-${index}`}
-                    >
-                      {message.role === "assistant" && (
-                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                          <Bot className="w-4 h-4 text-primary-foreground" />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[80%] rounded-lg p-4 ${
-                          message.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
-                      >
-                        {message.role === "user" ? (
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                        ) : (
-                          <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {message.content}
-                            </ReactMarkdown>
-                          </div>
-                        )}
-                        {message.tokensUsed && (
-                          <p className="text-xs mt-2 opacity-70">
-                            {message.tokensUsed} tokens
-                          </p>
-                        )}
-                      </div>
-                      {message.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                          <User className="w-4 h-4" />
-                        </div>
-                      )}
+              <div className="space-y-4">
+                {messages.length === 0 && !sendMutation.isPending && (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-12" data-testid="container-empty-chat">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <Bot className="w-8 h-8 text-muted-foreground" />
                     </div>
-                  ))}
-                  <AnimatePresence mode="wait">
-                    {sendMutation.isPending && (
-                      <div className="flex justify-center w-full my-8" data-testid="message-loading">
-                        <ParticleWaveLoader />
+                    <h3 className="text-lg font-semibold mb-2">Start a conversation</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Test your persona by sending messages. The AI will respond based on your training.
+                    </p>
+                  </div>
+                )}
+                
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex gap-3 ${
+                      message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
+                    data-testid={`message-${index}`}
+                  >
+                    {message.role === "assistant" && (
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                        <Bot className="w-4 h-4 text-primary-foreground" />
                       </div>
                     )}
-                  </AnimatePresence>
-                  <div ref={scrollRef} />
-                </div>
-              )}
+                    <div
+                      className={`max-w-[80%] rounded-lg p-4 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {message.role === "user" ? (
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      ) : (
+                        <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+                      {message.tokensUsed && (
+                        <p className="text-xs mt-2 opacity-70">
+                          {message.tokensUsed} tokens
+                        </p>
+                      )}
+                    </div>
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                <AnimatePresence>
+                  {sendMutation.isPending && (
+                    <div key="particle-loader" className="flex justify-center w-full my-8" data-testid="message-loading">
+                      <ParticleWaveLoader />
+                    </div>
+                  )}
+                </AnimatePresence>
+                <div ref={scrollRef} />
+              </div>
             </ScrollArea>
             <div className="p-4 border-t border-border">
               <div className="flex gap-2">

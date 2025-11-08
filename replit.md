@@ -115,13 +115,17 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
-- **2025-11-08**: Added premium AI loading animations
-  - Created reusable AILoadingSpinner component with particle sphere animation
-  - Integrated framer-motion for smooth, staggered particle animations (~70 animated circles)
-  - Added modal overlay loading for persona creation/update operations
-  - Added inline chat loading animation for AI response generation
-  - Supports size variants (sm/lg) and optional contextual messages
-  - Mirrors modern AI tool aesthetics (ChatGPT, Claude, Gemini)
+- **2025-11-08**: Added futuristic 3D particle-wave loader
+  - Created ParticleWaveLoader component with morphing blob animation using Three.js
+  - 800 WebGL particles with gradient colors (electric blue → violet → magenta)
+  - Custom shader material for neon glow effects and additive blending
+  - Multiple wave functions for organic, breathing movement
+  - Pre-computed particle parameters for smooth deterministic animation
+  - Automatic WebGL detection with CSS fallback for browser compatibility
+  - CSS fallback uses 50 framer-motion animated particles with gradient colors
+  - Proper memory management with geometry/material disposal
+  - AnimatePresence integration for smooth fade in/out transitions
+  - Applied to chat sandbox for premium AI thinking indicator
 
 - **2025-11-08**: Database persistence and security features
   - Migrated from in-memory to PostgreSQL with Drizzle ORM
