@@ -1,15 +1,30 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings, TrendingUp } from "lucide-react";
+import { MessageSquare, Settings, Copy, Check } from "lucide-react";
 import type { PersonaWithStats } from "@shared/schema";
 import { Link } from "wouter";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PersonaCardProps {
   persona: PersonaWithStats;
 }
 
 export function PersonaCard({ persona }: PersonaCardProps) {
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+
+  const copyPersonaId = async () => {
+    await navigator.clipboard.writeText(persona.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: "Copied",
+      description: "Persona ID copied to clipboard",
+    });
+  };
+
   return (
     <Card className="hover-elevate transition-all persona-glow-subtle" data-testid={`card-persona-${persona.id}`}>
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
@@ -20,6 +35,19 @@ export function PersonaCard({ persona }: PersonaCardProps) {
           <CardDescription className="text-sm mt-1 line-clamp-2">
             {persona.description}
           </CardDescription>
+          <div className="flex items-center gap-2 mt-2">
+            <code className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded" data-testid={`text-persona-id-${persona.id}`}>
+              ID: {persona.id}
+            </code>
+            <button
+              onClick={copyPersonaId}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              title="Copy Persona ID"
+              data-testid={`button-copy-id-${persona.id}`}
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </button>
+          </div>
         </div>
         <Badge variant={persona.isPublished ? "default" : "secondary"} data-testid={`badge-status-${persona.id}`}>
           {persona.isPublished ? "Published" : "Draft"}

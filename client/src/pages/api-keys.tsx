@@ -24,6 +24,7 @@ export default function ApiKeys() {
   const [keyName, setKeyName] = useState("");
   const [selectedPersonaId, setSelectedPersonaId] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [copiedPersonaId, setCopiedPersonaId] = useState<string | null>(null);
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
   const [showKeyDialog, setShowKeyDialog] = useState(false);
 
@@ -392,6 +393,7 @@ print(f"Tokens used: {result['tokensUsed']}")`;
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Persona</TableHead>
+                  <TableHead>Persona ID</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Last Used</TableHead>
@@ -401,10 +403,34 @@ print(f"Tokens used: {result['tokensUsed']}")`;
               <TableBody>
                 {apiKeys.map((apiKey) => {
                   const persona = personas?.find((p) => p.id === apiKey.personaId);
+
                   return (
                     <TableRow key={apiKey.id} data-testid={`row-api-key-${apiKey.id}`}>
                       <TableCell className="font-medium">{apiKey.name}</TableCell>
                       <TableCell>{persona?.name || "Unknown"}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs font-mono text-muted-foreground" data-testid={`text-persona-id-${apiKey.id}`}>
+                            {apiKey.personaId.substring(0, 8)}...
+                          </code>
+                          <button
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(apiKey.personaId);
+                              setCopiedPersonaId(apiKey.personaId);
+                              setTimeout(() => setCopiedPersonaId(null), 2000);
+                              toast({
+                                title: "Copied",
+                                description: "Persona ID copied to clipboard",
+                              });
+                            }}
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                            title="Copy full Persona ID"
+                            data-testid={`button-copy-persona-id-${apiKey.id}`}
+                          >
+                            {copiedPersonaId === apiKey.personaId ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Badge variant={apiKey.isActive ? "default" : "secondary"}>
                           {apiKey.isActive ? "Active" : "Disabled"}
