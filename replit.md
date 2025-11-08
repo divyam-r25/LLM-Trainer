@@ -19,10 +19,11 @@ ForgeAI is a platform that lets anyone create, simulate, and publish custom AI p
 ### Core Functionality
 1. **Persona Creation**: Define AI personas through intent descriptions and few-shot examples
 2. **Adaptive Prompt Builder**: Automatically generates structured system prompts from user inputs
-3. **Live Chat Sandbox**: Test personas in real-time with conversation history
-4. **API Deployment**: One-click publish to generate public API endpoints
-5. **API Key Management**: Generate and manage access keys for each persona
+3. **Live Chat Sandbox**: Test personas in real-time with conversation history and persistent sessions
+4. **API Deployment**: One-click publish to generate public API endpoints with secure authentication
+5. **API Key Management**: Generate, regenerate, and manage bcrypt-hashed access keys
 6. **Analytics Dashboard**: Track token usage, requests, and performance metrics
+7. **Premium Loading Animations**: Particle sphere animations with framer-motion for AI operations
 
 ### Data Models
 
@@ -36,17 +37,20 @@ ForgeAI is a platform that lets anyone create, simulate, and publish custom AI p
 ### Frontend Components
 - Dashboard with persona library grid
 - Persona creation/edit forms with intent and example inputs
-- Chat sandbox with message bubbles and typing indicators
-- API deployment page with code examples
-- API key management with copy-to-clipboard
-- Analytics dashboard with metric cards and tables
+- Chat sandbox with markdown rendering, persistent sessions, and message history
+- API deployment page with code examples and endpoint documentation
+- API key management with secure hashing, regeneration, and copy-to-clipboard
+- Analytics dashboard with metric cards and usage tables
+- Premium AI loading animations with particle sphere effects
 
 ### Backend Architecture
 - RESTful API endpoints for CRUD operations
 - Google Gemini integration for chat completions
-- In-memory storage (MemStorage) for rapid prototyping
+- PostgreSQL database with Drizzle ORM
+- Bcrypt-hashed API keys with rate limiting (60 req/min)
 - Request validation using Zod schemas
 - Adaptive prompt engineering system
+- Chat message persistence with session management
 
 ## API Endpoints
 
@@ -70,7 +74,7 @@ ForgeAI is a platform that lets anyone create, simulate, and publish custom AI p
 
 ## Design Guidelines
 
-ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design:
+ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design with premium AI-tool aesthetics:
 
 - Clean, scannable hierarchy with clear visual weight
 - Developer-first UX prioritizing speed and clarity
@@ -80,6 +84,7 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design:
 - Cards in responsive grids for persona library
 - Code blocks with syntax highlighting and copy buttons
 - Beautiful empty states and loading skeletons
+- Premium particle sphere loading animations for AI operations
 
 ## Environment Variables
 
@@ -96,16 +101,35 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design:
 - ✅ Beautiful loading and empty states
 - ✅ Responsive layouts
 
-### Completed (MVP)
+### Completed (MVP + Enhancements)
 - ✅ Backend implementation with RESTful APIs
 - ✅ Gemini AI integration for chat completions
+- ✅ PostgreSQL database with complete data persistence
+- ✅ Bcrypt-hashed API keys with rate limiting
 - ✅ Analytics tracking with token usage
 - ✅ Complete CRUD operations for personas, API keys
-- ✅ Chat sandbox with conversation history
+- ✅ Chat sandbox with markdown rendering and persistent sessions
 - ✅ API deployment and key management
 - ✅ Improved error handling with clear user messages
+- ✅ Premium AI loading animations with particle sphere effects
 
 ## Recent Changes
+
+- **2025-11-08**: Added premium AI loading animations
+  - Created reusable AILoadingSpinner component with particle sphere animation
+  - Integrated framer-motion for smooth, staggered particle animations (~70 animated circles)
+  - Added modal overlay loading for persona creation/update operations
+  - Added inline chat loading animation for AI response generation
+  - Supports size variants (sm/lg) and optional contextual messages
+  - Mirrors modern AI tool aesthetics (ChatGPT, Claude, Gemini)
+
+- **2025-11-08**: Database persistence and security features
+  - Migrated from in-memory to PostgreSQL with Drizzle ORM
+  - Implemented bcrypt-hashed API keys with regeneration capability
+  - Added rate limiting at 60 requests/minute per API key
+  - Chat message persistence with localStorage session management
+  - Markdown rendering with react-markdown and remark-gfm
+  - Clear chat functionality maintains session continuity
 
 - **2025-11-08**: Switched from OpenAI to Google Gemini
   - Replaced OpenAI integration with Gemini AI (gemini-2.5-flash model)
