@@ -368,11 +368,11 @@ export default function Home() {
                 <h1 className="text-5xl lg:text-7xl font-bold leading-tight" data-testid="text-hero-title">
                   <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent text-[64px] text-center">Train.Test. Deploy</span>
                   <br />
-                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-[64px] text-center">
                     custom AI personas
                   </span>
                   <br />
-                  <span className="text-foreground">in minutes.</span>
+                  <span className="text-foreground text-[64px]">in minutes.</span>
                 </h1>
                 
                 <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-xl" data-testid="text-hero-subtitle">
