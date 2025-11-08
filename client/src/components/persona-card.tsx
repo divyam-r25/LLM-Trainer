@@ -11,7 +11,7 @@ interface PersonaCardProps {
 
 export function PersonaCard({ persona }: PersonaCardProps) {
   return (
-    <Card className="hover-elevate transition-all" data-testid={`card-persona-${persona.id}`}>
+    <Card className="hover-elevate transition-all persona-glow-subtle" data-testid={`card-persona-${persona.id}`}>
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
         <div className="flex-1 min-w-0">
           <CardTitle className="text-lg font-semibold truncate" data-testid={`text-persona-name-${persona.id}`}>

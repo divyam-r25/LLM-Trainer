@@ -119,7 +119,7 @@ export function AppSidebar() {
               <ScrollArea className="h-[300px]">
                 <SidebarMenu>
                   {personas.slice(0, 10).map((persona) => (
-                    <SidebarMenuItem key={persona.id}>
+                    <SidebarMenuItem key={persona.id} className="sidebar-persona-glow">
                       <SidebarMenuButton asChild isActive={location === `/chat/${persona.id}`}>
                         <Link href={`/chat/${persona.id}`} data-testid={`link-persona-${persona.id}`}>
                           <MessageSquare className="w-4 h-4" />

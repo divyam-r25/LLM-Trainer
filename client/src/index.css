@@ -14,40 +14,42 @@ html {
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
-  --background: 200 16% 92%;
-  --foreground: 222 47% 11%;
-  --border: 200 12% 85%;
+  --background: 240 13% 96%;
+  --foreground: 0 0% 0%;
+  --border: 180 20% 80%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --card-border: 200 12% 88%;
-  --sidebar: 207 52% 31%;
+  --card-foreground: 0 0% 0%;
+  --card-border: 180 20% 85%;
+  --sidebar: 200 29% 25%;
   --sidebar-foreground: 0 0% 100%;
-  --sidebar-border: 207 52% 25%;
-  --sidebar-primary: 201 39% 56%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 203 74% 79%;
-  --sidebar-accent-foreground: 222 47% 11%;
-  --sidebar-ring: 201 39% 56%;
+  --sidebar-border: 200 29% 20%;
+  --sidebar-primary: 180 20% 80%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 184 24% 80%;
+  --sidebar-accent-foreground: 0 0% 0%;
+  --sidebar-ring: 184 24% 80%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --popover-border: 200 12% 88%;
-  --primary: 207 52% 31%;
+  --popover-foreground: 0 0% 0%;
+  --popover-border: 180 20% 85%;
+  --primary: 200 29% 25%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 201 39% 56%;
+  --secondary: 200 12% 44%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 80 2% 54%;
-  --muted-foreground: 80 2% 45%;
-  --accent: 203 74% 79%;
-  --accent-foreground: 222 47% 11%;
+  --muted: 200 12% 50%;
+  --muted-foreground: 200 12% 35%;
+  --accent: 184 24% 80%;
+  --accent-foreground: 0 0% 0%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --input: 200 12% 85%;
-  --ring: 207 52% 31%;
-  --chart-1: 201 39% 56%;
-  --chart-2: 203 74% 79%;
-  --chart-3: 207 52% 31%;
-  --chart-4: 80 2% 54%;
-  --chart-5: 200 16% 92%;
+  --input: 180 20% 85%;
+  --ring: 184 24% 80%;
+  --chart-1: 184 24% 80%;
+  --chart-2: 200 12% 44%;
+  --chart-3: 200 29% 25%;
+  --chart-4: 240 13% 96%;
+  --chart-5: 180 20% 80%;
+  --glow-primary: 184 24% 80%;
+  --glow-secondary: 200 12% 44%;
   --font-sans: Inter, system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, Consolas, monospace;
@@ -98,40 +100,42 @@ html {
   --opaque-button-border-intensity: 9;
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
-  --background: 207 52% 8%;
+  --background: 200 29% 15%;
   --foreground: 0 0% 98%;
-  --border: 207 30% 18%;
-  --card: 207 40% 12%;
+  --border: 200 20% 30%;
+  --card: 200 29% 20%;
   --card-foreground: 0 0% 98%;
-  --card-border: 207 30% 15%;
-  --sidebar: 207 52% 20%;
+  --card-border: 200 20% 25%;
+  --sidebar: 200 29% 25%;
   --sidebar-foreground: 0 0% 98%;
-  --sidebar-border: 207 40% 25%;
-  --sidebar-primary: 201 39% 56%;
-  --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 203 60% 40%;
+  --sidebar-border: 200 20% 30%;
+  --sidebar-primary: 184 24% 80%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 184 24% 60%;
   --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-ring: 201 39% 56%;
-  --popover: 207 40% 15%;
+  --sidebar-ring: 184 24% 80%;
+  --popover: 200 29% 20%;
   --popover-foreground: 0 0% 98%;
-  --popover-border: 207 30% 20%;
-  --primary: 201 39% 56%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 207 35% 35%;
+  --popover-border: 200 20% 30%;
+  --primary: 184 24% 80%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 200 12% 44%;
   --secondary-foreground: 0 0% 98%;
-  --muted: 207 20% 25%;
+  --muted: 200 12% 35%;
   --muted-foreground: 200 10% 70%;
-  --accent: 203 60% 45%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 184 24% 70%;
+  --accent-foreground: 0 0% 0%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
-  --input: 207 30% 25%;
-  --ring: 201 39% 56%;
-  --chart-1: 201 39% 56%;
-  --chart-2: 203 74% 79%;
-  --chart-3: 207 52% 45%;
-  --chart-4: 200 16% 70%;
-  --chart-5: 80 2% 60%;
+  --input: 200 20% 30%;
+  --ring: 184 24% 80%;
+  --chart-1: 184 24% 80%;
+  --chart-2: 200 12% 44%;
+  --chart-3: 200 29% 35%;
+  --chart-4: 240 13% 80%;
+  --chart-5: 180 20% 70%;
+  --glow-primary: 184 24% 80%;
+  --glow-secondary: 200 12% 44%;
   --shadow-2xs: 0px 2px 0px 0px hsl(217 91% 60% / 0.00);
   --shadow-xs: 0px 2px 0px 0px hsl(217 91% 60% / 0.00);
   --shadow-sm: 0px 2px 0px 0px hsl(217 91% 60% / 0.00), 0px 1px 2px -1px hsl(217 91% 60% / 0.00);
@@ -361,5 +365,84 @@ html {
       linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
     background-size: 40px 40px;
+  }
+
+  /* Glowing Effects for Personas */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--glow-primary) / 0.3),
+                  0 0 10px hsl(var(--glow-primary) / 0.2),
+                  0 0 15px hsl(var(--glow-primary) / 0.1);
+    }
+    50% {
+      box-shadow: 0 0 10px hsl(var(--glow-primary) / 0.5),
+                  0 0 20px hsl(var(--glow-primary) / 0.4),
+                  0 0 30px hsl(var(--glow-primary) / 0.3);
+    }
+  }
+
+  @keyframes glow-border {
+    0%, 100% {
+      border-color: hsl(var(--glow-primary) / 0.5);
+    }
+    50% {
+      border-color: hsl(var(--glow-primary) / 1);
+    }
+  }
+
+  .persona-glow {
+    position: relative;
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .persona-glow-border {
+    border: 2px solid hsl(var(--glow-primary) / 0.5);
+    animation: glow-border 3s ease-in-out infinite;
+  }
+
+  .persona-glow-subtle {
+    box-shadow: 0 0 8px hsl(var(--glow-primary) / 0.2),
+                0 0 12px hsl(var(--glow-primary) / 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .persona-glow-subtle:hover {
+    box-shadow: 0 0 15px hsl(var(--glow-primary) / 0.4),
+                0 0 25px hsl(var(--glow-primary) / 0.3),
+                0 0 35px hsl(var(--glow-primary) / 0.2);
+  }
+
+  .persona-icon-glow {
+    filter: drop-shadow(0 0 4px hsl(var(--glow-primary) / 0.6))
+            drop-shadow(0 0 8px hsl(var(--glow-primary) / 0.4));
+  }
+
+  /* Sidebar persona item glow */
+  .sidebar-persona-glow {
+    position: relative;
+  }
+
+  .sidebar-persona-glow::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: linear-gradient(to bottom, 
+      transparent,
+      hsl(var(--glow-primary) / 0.6),
+      hsl(var(--glow-primary) / 0.8),
+      hsl(var(--glow-primary) / 0.6),
+      transparent
+    );
+    box-shadow: 0 0 8px hsl(var(--glow-primary) / 0.5);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-persona-glow:hover::before {
+    opacity: 1;
   }
 }
