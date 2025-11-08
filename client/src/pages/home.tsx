@@ -374,11 +374,11 @@ export default function Home() {
                     custom AI personas
                   </span>
                   <br />
-                  <span className="text-foreground">— in minutes.</span>
+                  <span className="text-foreground">in minutes.</span>
                 </h1>
                 
                 <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-xl" data-testid="text-hero-subtitle">
-                  ForgeAI lets you build specialized AI assistants for your business or app — no fine-tuning required.
+                  ForgeAI lets you build specialized AI assistants for your business or app - no fine-tuning required.
                 </p>
               </div>
 
@@ -545,7 +545,7 @@ export default function Home() {
               Try It Yourself
             </h2>
             <p className="text-xl text-muted-foreground">
-              See how easy it is to create a custom AI persona — no signup required for this preview.
+              See how easy it is to create a custom AI persona - no signup required for this preview.
             </p>
           </div>
 
