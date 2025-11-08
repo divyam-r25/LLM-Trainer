@@ -115,16 +115,15 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
-- **2025-11-08**: ✅ Completed futuristic 3D particle-wave loader implementation
-  - Created ParticleWaveLoader component with morphing blob animation using Three.js
-  - **WebGL Path**: 800 particles with gradient colors (electric blue → violet → magenta), custom shader for neon glow, additive blending, organic wave functions
-  - **CSS Fallback**: 50 framer-motion particles with matching gradient, works in all browsers including headless/test environments
-  - **Smart Detection**: Automatic WebGL availability check, graceful degradation with try-catch error handling
-  - **Memory Management**: Proper cleanup of Three.js geometry, materials, and renderer on unmount
-  - **Smooth Transitions**: AnimatePresence with keyed components for fade-in/fade-out animations
-  - **Chat Integration**: Fixed critical rendering bug - loader now appears on FIRST message and all subsequent messages
-  - **User Experience**: Disabled inputs during loading, smooth visual feedback, no crashes or errors
-  - **Tested & Verified**: Visual confirmation via screenshots showing loader working in both initial and subsequent message states
+- **2025-11-08**: ✅ Implemented clean AI thinking loader
+  - Replaced complex 3D particle system with simple, professional loading indicator
+  - **Design**: Three pulsing dots with "Thinking..." text - matches modern AI chat UX patterns (ChatGPT, Claude)
+  - **Animation**: Smooth framer-motion pulsing with sequential staggered delays (0.2s)
+  - **Styling**: Muted background, rounded corners, compact size aligned to assistant side
+  - **Performance**: Lightweight, fast rendering, works in all browsers without fallback complexity
+  - **Integration**: Appears on first and subsequent messages via AnimatePresence transitions
+  - **User Feedback**: Clean, minimal, professional appearance that doesn't overwhelm the chat
+  - **Tested**: E2E test confirmed loader appears correctly with smooth transitions
 
 - **2025-11-08**: Database persistence and security features
   - Migrated from in-memory to PostgreSQL with Drizzle ORM
