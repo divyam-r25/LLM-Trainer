@@ -237,41 +237,61 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right Column - Dashboard Mockup */}
-            <div className="relative">
-              <div className="relative rounded-lg border border-border bg-card p-6 shadow-xl">
-                <div className="space-y-4">
+            {/* Right Column - Persona Cards */}
+            <div className="relative space-y-4">
+              <Card className="hover-elevate transition-all" data-testid="card-persona-preview-1">
+                <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
                       <Sparkles className="w-5 h-5 text-primary-foreground" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <div className="font-semibold">Customer Support Bot</div>
-                      <div className="text-sm text-muted-foreground">Published • v2.1</div>
+                      <div className="text-sm text-muted-foreground">Published • Ready</div>
                     </div>
+                    <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
+                      Live
+                    </Badge>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <div className="text-muted-foreground text-xs">Requests</div>
-                      <div className="font-mono font-semibold mt-1">1,247</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="hover-elevate transition-all" data-testid="card-persona-preview-2">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-md bg-purple-500 flex items-center justify-center">
+                      <Brain className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                      <div className="text-muted-foreground text-xs">Tokens</div>
-                      <div className="font-mono font-semibold mt-1">42.3K</div>
+                    <div className="flex-1">
+                      <div className="font-semibold">Code Review Assistant</div>
+                      <div className="text-sm text-muted-foreground">Testing</div>
                     </div>
-                    <div>
-                      <div className="text-muted-foreground text-xs">API Keys</div>
-                      <div className="font-mono font-semibold mt-1">3</div>
-                    </div>
+                    <Badge variant="secondary">
+                      Draft
+                    </Badge>
                   </div>
-                  <div className="pt-4 border-t border-border flex gap-2">
-                    <div className="flex-1 h-8 rounded bg-muted"></div>
-                    <div className="flex-1 h-8 rounded bg-primary/20"></div>
+                </CardContent>
+              </Card>
+              
+              <Card className="hover-elevate transition-all" data-testid="card-persona-preview-3">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-md bg-orange-500 flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold">Sales Assistant</div>
+                      <div className="text-sm text-muted-foreground">Published • Ready</div>
+                    </div>
+                    <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
+                      Live
+                    </Badge>
                   </div>
-                </div>
-              </div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
-              <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+                </CardContent>
+              </Card>
+              
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10"></div>
+              <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10"></div>
             </div>
           </div>
         </div>

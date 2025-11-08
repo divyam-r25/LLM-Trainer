@@ -118,7 +118,8 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 - **2025-11-08**: ✅ Built complete ForgeAI Homepage
   - Modern, responsive landing page with Linear/Vercel aesthetic
   - Fixed navigation bar with logo and menu links
-  - Hero section with compelling headline and dual CTAs
+  - Hero section with compelling headline, dual CTAs, and animated persona cards
+  - Replaced detailed analytics mockup with clean persona card previews
   - "Why ForgeAI" feature cards (No Fine-Tuning, Real-Time Testing, API-Ready)
   - Feature comparison table (ForgeAI vs Manual Prompting)
   - Interactive trial section for persona preview simulation
