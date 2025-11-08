@@ -31,8 +31,8 @@ export const apiKeys = pgTable("api_keys", {
 // Analytics table - tracks usage metrics
 export const analytics = pgTable("analytics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  personaId: varchar("persona_id").notNull().references(() => personas.id),
-  apiKeyId: varchar("api_key_id").references(() => apiKeys.id),
+  personaId: varchar("persona_id").notNull().references(() => personas.id, { onDelete: "cascade" }),
+  apiKeyId: varchar("api_key_id").references(() => apiKeys.id, { onDelete: "cascade" }),
   tokensUsed: integer("tokens_used").notNull().default(0),
   requestCount: integer("request_count").notNull().default(1),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
