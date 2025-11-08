@@ -10,7 +10,7 @@ ForgeAI is a platform that lets anyone create, simulate, and publish custom AI p
 
 - **Frontend**: React + TypeScript with Wouter routing
 - **Backend**: Express.js with in-memory storage
-- **AI Integration**: OpenAI API (gpt-5) for chat completions
+- **AI Integration**: Google Gemini API (gemini-2.5-flash) for chat completions
 - **Design System**: Tailwind CSS + Shadcn UI components
 - **State Management**: TanStack Query for data fetching
 
@@ -43,7 +43,7 @@ ForgeAI is a platform that lets anyone create, simulate, and publish custom AI p
 
 ### Backend Architecture
 - RESTful API endpoints for CRUD operations
-- OpenAI integration for chat completions
+- Google Gemini integration for chat completions
 - In-memory storage (MemStorage) for rapid prototyping
 - Request validation using Zod schemas
 - Adaptive prompt engineering system
@@ -83,7 +83,7 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design:
 
 ## Environment Variables
 
-- `OPENAI_API_KEY` - OpenAI API key for chat completions
+- `GEMINI_API_KEY` - Google Gemini API key for chat completions
 
 ## Development Status
 
@@ -96,16 +96,27 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design:
 - ✅ Beautiful loading and empty states
 - ✅ Responsive layouts
 
-### In Progress
-- Backend implementation
-- API integration
-- OpenAI chat completion
-- Analytics tracking
+### Completed (MVP)
+- ✅ Backend implementation with RESTful APIs
+- ✅ Gemini AI integration for chat completions
+- ✅ Analytics tracking with token usage
+- ✅ Complete CRUD operations for personas, API keys
+- ✅ Chat sandbox with conversation history
+- ✅ API deployment and key management
+- ✅ Improved error handling with clear user messages
 
 ## Recent Changes
 
-- **2024-01-08**: Initial schema and frontend implementation complete
+- **2025-11-08**: Switched from OpenAI to Google Gemini
+  - Replaced OpenAI integration with Gemini AI (gemini-2.5-flash model)
+  - Updated error handling for better user feedback
+  - Fixed persona form hydration bug for edit workflow
+  - Improved chat error messages to show specific quota/auth issues
+  - All MVP features complete and functional
+
+- **2025-11-08**: Initial MVP implementation complete
   - Created all data models (Persona, ApiKey, Analytics, ChatMessage)
   - Built complete UI with sidebar navigation
   - Implemented all pages: Dashboard, Persona Form, Chat Sandbox, Deploy, API Keys, Analytics
+  - Backend APIs for CRUD operations, chat, analytics
   - Configured design tokens for developer-focused aesthetic

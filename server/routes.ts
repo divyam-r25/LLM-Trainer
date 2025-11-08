@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import { insertPersonaSchema, insertApiKeySchema, type ChatRequest, type ChatResponse } from "@shared/schema";
-import { generateSystemPrompt, getChatCompletion } from "./openai";
+import { generateSystemPrompt, getChatCompletion } from "./gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Personas
@@ -177,21 +177,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Chat error:", error);
       
-      if (error?.status === 429) {
+      if (error?.status === 429 || error?.code === 'insufficient_quota') {
         return res.status(429).json({ 
-          error: "OpenAI API quota exceeded. Please check your OpenAI account billing and add credits." 
-        });
-      }
-      
-      if (error?.code === 'insufficient_quota') {
-        return res.status(429).json({ 
-          error: "OpenAI API quota exceeded. Please add credits to your OpenAI account." 
+          error: "AI API quota exceeded. Please check your API key billing and add credits." 
         });
       }
 
-      if (error?.status === 401) {
+      if (error?.status === 401 || error?.code === 'UNAUTHENTICATED') {
         return res.status(500).json({ 
-          error: "OpenAI API key is invalid. Please check your OPENAI_API_KEY environment variable." 
+          error: "AI API key is invalid. Please check your GEMINI_API_KEY environment variable." 
         });
       }
       
