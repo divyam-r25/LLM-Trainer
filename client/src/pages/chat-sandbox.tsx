@@ -12,7 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ParticleWaveLoader } from "@/components/particle-wave-loader";
+import { AIThinkingLoader } from "@/components/ai-thinking-loader";
 import { AnimatePresence } from "framer-motion";
 
 interface Message {
@@ -259,8 +259,8 @@ export default function ChatSandbox() {
                 
                 <AnimatePresence>
                   {sendMutation.isPending && (
-                    <div key="particle-loader" className="flex justify-center w-full my-8" data-testid="message-loading">
-                      <ParticleWaveLoader />
+                    <div key="ai-thinking" className="flex w-full my-4">
+                      <AIThinkingLoader />
                     </div>
                   )}
                 </AnimatePresence>
