@@ -54,9 +54,27 @@ export default function Home() {
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
-      setLocation("/dashboard");
+      // If we have trial data, prefill the persona form
+      if (trialPersonaName || trialIntent) {
+        const params = new URLSearchParams();
+        if (trialPersonaName) params.set("name", trialPersonaName);
+        if (trialIntent) params.set("intent", trialIntent);
+        if (trialExample) params.set("example", trialExample);
+        setLocation(`/personas/new?${params.toString()}`);
+      } else {
+        setLocation("/dashboard");
+      }
     } else {
-      window.location.href = "/api/login";
+      // If not authenticated, redirect to login with returnTo
+      if (trialPersonaName || trialIntent) {
+        const params = new URLSearchParams();
+        if (trialPersonaName) params.set("name", trialPersonaName);
+        if (trialIntent) params.set("intent", trialIntent);
+        if (trialExample) params.set("example", trialExample);
+        window.location.href = `/api/login?returnTo=${encodeURIComponent(`/personas/new?${params.toString()}`)}`;
+      } else {
+        window.location.href = "/api/login";
+      }
     }
   };
 
@@ -66,14 +84,14 @@ export default function Home() {
       return;
     }
 
-    // If authenticated, redirect to /dashboard/create with prefilled data
+    // If authenticated, redirect to /personas/new with prefilled data
     if (isAuthenticated) {
       const params = new URLSearchParams({
         name: trialPersonaName,
         intent: trialIntent,
         ...(trialExample && { example: trialExample }),
       });
-      setLocation(`/dashboard/create?${params.toString()}`);
+      setLocation(`/personas/new?${params.toString()}`);
       return;
     }
 

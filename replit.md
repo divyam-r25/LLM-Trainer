@@ -115,6 +115,43 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
+- **2025-11-08**: ✅ Implemented Complete Authentication System with Replit Auth
+  - **Backend Authentication**:
+    - Installed and configured Replit Auth blueprint (OAuth with Google + Email/Password)
+    - Added `users` and `sessions` tables to PostgreSQL schema
+    - Created `replitAuth.ts` middleware for OAuth flow and session management
+    - Implemented `isAuthenticated` middleware to protect all privileged routes
+    - Added auth routes: `/api/login`, `/api/logout`, `/api/auth/user`, `/api/callback`
+    - **Security Hardening**:
+      - All persona CRUD endpoints now require authentication
+      - All chat sandbox endpoints protected
+      - All API key management endpoints protected
+      - ReturnTo parameter sanitization prevents open redirect vulnerability
+      - Session cookie `secure` flag is environment-aware (false in dev, true in prod)
+  - **Frontend Authentication**:
+    - Created `useAuth` React hook for managing auth state (`user`, `isAuthenticated`, `isLoading`)
+    - Added `authUtils` for error handling and 401 redirect logic
+    - Updated homepage navigation with Login button and user dropdown menu
+    - User menu shows avatar, name, email, and logout option
+    - Trial section works without login (preview only)
+    - After login, trial data prefills persona form via query parameters
+  - **User Flow**:
+    - Unauthenticated users see Login button in navigation
+    - Trial section allows preview without authentication
+    - "Create Free Account" button redirects to `/api/login?returnTo=/personas/new?...`
+    - After OAuth completes, user redirected to persona form with prefilled trial data
+    - Protected dashboard pages check auth and redirect to login on 401
+    - Logout destroys session and redirects to homepage
+  - **Database Schema**:
+    - `users`: id, sub (Replit user ID), email, firstName, lastName, profileImageUrl
+    - `sessions`: PostgreSQL-backed express-session storage with 7-day TTL
+  - **E2E Testing**: Complete authentication flow tested successfully
+    - Unauthenticated trial preview ✓
+    - Login with returnTo parameter ✓
+    - Protected endpoint access ✓
+    - Query param prefilling ✓
+    - Logout flow ✓
+
 - **2025-11-08**: ✅ Built complete ForgeAI Homepage
   - Modern, responsive landing page with Linear/Vercel aesthetic
   - Fixed navigation bar with logo and menu links

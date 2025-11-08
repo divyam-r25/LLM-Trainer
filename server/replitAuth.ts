@@ -37,7 +37,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
+      // Only use secure cookies in production (HTTPS required)
+      // Development uses HTTP, so secure must be false
+      secure: process.env.NODE_ENV === "production",
       maxAge: sessionTtl,
     },
   });
@@ -108,6 +110,21 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    // Sanitize returnTo parameter to prevent open redirect vulnerability
+    // Only allow same-origin relative paths (must start with / but not //)
+    if (req.query.returnTo && typeof req.query.returnTo === "string") {
+      const returnTo = req.query.returnTo;
+      // Validate: must start with / but not // (protocol-relative URL)
+      // and must not start with http:// or https:// (absolute URL)
+      if (returnTo.startsWith("/") && !returnTo.startsWith("//") && !returnTo.match(/^https?:\/\//i)) {
+        req.session.returnTo = returnTo;
+      } else {
+        // Log rejected returnTo attempts to detect abuse
+        console.warn(`[Security] Rejected invalid returnTo: ${returnTo}`);
+        req.session.returnTo = "/";
+      }
+    }
+    
     ensureStrategy(req.hostname);
     passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",

@@ -28,8 +28,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Personas
-  app.get("/api/personas", async (req, res) => {
+  // Personas (Protected - require authentication)
+  app.get("/api/personas", isAuthenticated, async (req, res) => {
     try {
       const personas = await storage.getAllPersonas();
       res.json(personas);
@@ -38,7 +38,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/personas/:id", async (req, res) => {
+  app.get("/api/personas/:id", isAuthenticated, async (req, res) => {
     try {
       const persona = await storage.getPersona(req.params.id);
       if (!persona) {
@@ -50,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/personas", async (req, res) => {
+  app.post("/api/personas", isAuthenticated, async (req, res) => {
     try {
       const data = insertPersonaSchema.parse(req.body);
       
@@ -74,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id", async (req, res) => {
+  app.patch("/api/personas/:id", isAuthenticated, async (req, res) => {
     try {
       const data = insertPersonaSchema.partial().parse(req.body);
       
@@ -110,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/personas/:id", async (req, res) => {
+  app.delete("/api/personas/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deletePersona(req.params.id);
       if (!deleted) {
@@ -122,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id/publish", async (req, res) => {
+  app.patch("/api/personas/:id/publish", isAuthenticated, async (req, res) => {
     try {
       const persona = await storage.publishPersona(req.params.id);
       if (!persona) {
@@ -134,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id/unpublish", async (req, res) => {
+  app.patch("/api/personas/:id/unpublish", isAuthenticated, async (req, res) => {
     try {
       const persona = await storage.unpublishPersona(req.params.id);
       if (!persona) {
@@ -147,7 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat (Sandbox)
-  app.get("/api/chat/:personaId/history", async (req, res) => {
+  app.get("/api/chat/:personaId/history", isAuthenticated, async (req, res) => {
     try {
       const { personaId } = req.params;
       const { sessionId } = req.query;
@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/chat", async (req, res) => {
+  app.post("/api/chat", isAuthenticated, async (req, res) => {
     try {
       const { message, personaId, sessionId } = req.body as ChatRequest;
 
@@ -240,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/chat/:personaId/clear", async (req, res) => {
+  app.delete("/api/chat/:personaId/clear", isAuthenticated, async (req, res) => {
     try {
       const { personaId } = req.params;
       const { sessionId } = req.query;
@@ -344,7 +344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // API Keys
-  app.get("/api/api-keys", async (req, res) => {
+  app.get("/api/api-keys", isAuthenticated, async (req, res) => {
     try {
       const keys = await storage.getAllApiKeys();
       res.json(keys);
@@ -353,7 +353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/api-keys", async (req, res) => {
+  app.post("/api/api-keys", isAuthenticated, async (req, res) => {
     try {
       const data = insertApiKeySchema.parse(req.body);
       
@@ -374,7 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/api-keys/:id/regenerate", async (req, res) => {
+  app.patch("/api/api-keys/:id/regenerate", isAuthenticated, async (req, res) => {
     try {
       const plainTextKey = `fai_${randomUUID().replace(/-/g, "")}`;
       const keyHash = await bcrypt.hash(plainTextKey, 10);
@@ -394,7 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/api-keys/:id/toggle", async (req, res) => {
+  app.patch("/api/api-keys/:id/toggle", isAuthenticated, async (req, res) => {
     try {
       const { isActive } = req.body;
       
@@ -414,7 +414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/api-keys/:id", async (req, res) => {
+  app.delete("/api/api-keys/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deleteApiKey(req.params.id);
       if (!deleted) {
