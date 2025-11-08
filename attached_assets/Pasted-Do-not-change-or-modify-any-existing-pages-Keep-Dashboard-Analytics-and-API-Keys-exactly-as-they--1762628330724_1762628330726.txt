@@ -1,0 +1,145 @@
+Do not change or modify any existing pages.
+Keep Dashboard, Analytics, and API Keys exactly as they are.
+Only add the following two pages with full backend functionality and responsive design:
+
+1️⃣ Create Persona Page
+
+Path: /create
+Purpose: Allow users to create and save new AI personas.
+
+Frontend (React + Tailwind)
+
+Page title: “Create New Persona”
+
+Input fields:
+
+Persona Name (required)
+
+Description (optional)
+
+Intent (textarea, required)
+
+Few-Shot Examples (add/remove pairs → User Message & AI Response)
+
+Buttons:
+
+Save Persona → POST to /api/trainers
+
+Simulate Prompt → POST to /api/trainers/simulate
+
+Clear Form
+
+On successful save → Redirect to /chat/:id
+
+Show success/error toast messages
+
+Fully responsive layout (2-column on desktop, stacked on mobile)
+
+Use the existing dashboard sidebar layout for consistency
+
+Add a “+ New Persona” button in the sidebar linking to /create
+
+Backend (FastAPI)
+
+Add endpoints if not present:
+
+POST /api/trainers        # Create persona
+GET /api/trainers/{id}    # Fetch persona by ID
+POST /api/trainers/simulate  # Simulate adaptive prompt
+
+
+Each persona must be stored with:
+
+{
+  "id": "uuid",
+  "name": "string",
+  "description": "string",
+  "intent": "string",
+  "examples": [{"user": "text", "assistant": "text"}],
+  "created_at": "timestamp",
+  "user_id": "auth_id"
+}
+
+2️⃣ Chat Sandbox Page
+
+Path: /chat/:id
+Purpose: Test the created persona in a live chat environment.
+
+Frontend
+
+Chat interface:
+
+Scrollable message area
+
+Message bubbles for user and AI
+
+Input box with “Send” and “Clear Chat” buttons
+
+On mount → Fetch persona details via /api/trainers/{id}
+
+On send → POST /api/chat/{id} with { message }
+
+Display AI’s response with Markdown rendering (react-markdown + remark-gfm)
+
+Persist chat history per persona
+
+Responsive layout:
+
+Desktop → two-column (persona info sidebar + chat)
+
+Mobile → single-column full width
+
+Backend (FastAPI)
+
+Add or verify:
+
+POST /api/chat/{persona_id}         # Send message, get AI response
+GET /api/chat/history/{persona_id}  # Retrieve previous chat history
+DELETE /api/chat/history/{persona_id}  # Clear chat
+
+
+Each message stored as:
+
+{
+  "persona_id": "uuid",
+  "role": "user/assistant",
+  "content": "string",
+  "timestamp": "datetime"
+}
+
+
+Integrate with OpenAI API:
+
+response = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=[{"role": "system", "content": persona_prompt}, *history, {"role": "user", "content": user_msg}]
+)
+
+3️⃣ Integration
+
+“+ New Persona” in the Dashboard → links to /create
+
+“Test” button in each persona card → links to /chat/:id
+
+Sidebar and top layout remain identical
+
+Maintain responsiveness across all devices (mobile/tablet/desktop)
+
+Preserve existing dashboard design and color scheme:
+
+Primary Blue: #2563EB
+
+Background: #F9FAFB
+
+Text: #0F172A
+
+Expected Deliverables
+
+✅ /create page added and working with backend
+✅ /chat/:id page added and connected to backend
+✅ Both pages responsive
+✅ No modifications to existing Dashboard, Analytics, or API Keys
+✅ Persona creation, chat simulation, and message persistence fully functional
+
+Priority: 🔥 High
+Goal: Add only the missing Create Persona and Chat Sandbox pages to the existing ForgeAI dashboard. Keep all other pages untouched.
