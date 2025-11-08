@@ -115,6 +115,25 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
+- **2025-11-08**: ✅ Added Profile/Logout to Dashboard Sidebar
+  - **Sidebar Footer Component**:
+    - User profile section displays avatar with initials fallback
+    - Shows user full name (firstName + lastName) or email
+    - Dropdown menu with "My Account" label
+    - "Home" link to navigate back to homepage
+    - "Log Out" button with destructive styling (red)
+  - **Logout Flow Improvements**:
+    - Client-side: Clears TanStack Query auth cache before redirect
+    - Server-side: POST /api/logout endpoint properly destroys session
+    - Clears session cookie and invalidates auth state
+    - Redirects to homepage after successful logout
+  - **UI Enhancements**:
+    - Avatar component with profile image or initials
+    - Hover states on user menu trigger
+    - Clean dropdown with icons for each action
+  - **Testing**: Complete E2E test confirms login → profile menu → logout → homepage flow
+  - **Button Style Updates**: "View Demo" button padding customization (pt/pb/pl/pr classes)
+
 - **2025-11-08**: ✅ Enhanced Hero Section with Futuristic Design & Animations
   - **Typography Improvements**:
     - Gradient text effects on multi-line headline (lg:text-7xl)

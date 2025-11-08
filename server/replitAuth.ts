@@ -150,6 +150,26 @@ export async function setupAuth(app: Express) {
       );
     });
   });
+
+  // POST logout for SPA
+  app.post("/api/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      // Destroy the session
+      req.session.destroy((destroyErr) => {
+        if (destroyErr) {
+          console.error("Session destroy error:", destroyErr);
+          return res.status(500).json({ message: "Session destroy failed" });
+        }
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        res.json({ message: "Logged out successfully" });
+      });
+    });
+  });
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
