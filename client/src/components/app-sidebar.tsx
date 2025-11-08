@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import logoImage from "@assets/WhatsApp Image 2025-11-08 at 18.03.25_2ae07f67_1762608862100.jpg";
+import logoImage from "@assets/8bfed827-52ba-46fb-8296-0158062c5b28_1762612473771.jpg";
 
 const menuItems = [
   {
