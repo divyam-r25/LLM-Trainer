@@ -1,5 +1,5 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { sql, relations } from "drizzle-orm";
+import { pgTable, text, varchar, integer, timestamp, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -20,9 +20,10 @@ export const personas = pgTable("personas", {
 // API Keys table - stores generated API keys for accessing personas
 export const apiKeys = pgTable("api_keys", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  key: text("key").notNull().unique(),
-  personaId: varchar("persona_id").notNull().references(() => personas.id),
+  keyHash: text("key_hash").notNull().unique(),
+  personaId: varchar("persona_id").notNull().references(() => personas.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   lastUsedAt: timestamp("last_used_at"),
 });
@@ -40,11 +41,45 @@ export const analytics = pgTable("analytics", {
 // Chat messages - for sandbox testing
 export const chatMessages = pgTable("chat_messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  personaId: varchar("persona_id").notNull().references(() => personas.id),
+  personaId: varchar("persona_id").notNull().references(() => personas.id, { onDelete: "cascade" }),
+  sessionId: varchar("session_id").notNull().default("default"),
   role: text("role").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+// Define relations
+export const personasRelations = relations(personas, ({ many }) => ({
+  apiKeys: many(apiKeys),
+  chatMessages: many(chatMessages),
+  analytics: many(analytics),
+}));
+
+export const apiKeysRelations = relations(apiKeys, ({ one, many }) => ({
+  persona: one(personas, {
+    fields: [apiKeys.personaId],
+    references: [personas.id],
+  }),
+  analytics: many(analytics),
+}));
+
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  persona: one(personas, {
+    fields: [chatMessages.personaId],
+    references: [personas.id],
+  }),
+}));
+
+export const analyticsRelations = relations(analytics, ({ one }) => ({
+  persona: one(personas, {
+    fields: [analytics.personaId],
+    references: [personas.id],
+  }),
+  apiKey: one(apiKeys, {
+    fields: [analytics.apiKeyId],
+    references: [apiKeys.id],
+  }),
+}));
 
 // Insert schemas
 export const insertPersonaSchema = createInsertSchema(personas, {
@@ -62,9 +97,10 @@ export const insertApiKeySchema = createInsertSchema(apiKeys, {
   name: z.string().min(1, "API key name is required"),
 }).omit({
   id: true,
-  key: true,
+  keyHash: true,
   createdAt: true,
   lastUsedAt: true,
+  isActive: true,
 });
 
 export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
@@ -94,9 +130,14 @@ export type PersonaWithStats = Persona & {
 export type ChatRequest = {
   message: string;
   personaId: string;
+  sessionId?: string;
 };
 
 export type ChatResponse = {
   message: string;
   tokensUsed: number;
+};
+
+export type ApiKeyWithPlainText = ApiKey & {
+  plainTextKey?: string;
 };

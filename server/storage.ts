@@ -1,4 +1,8 @@
 import {
+  personas,
+  apiKeys,
+  analytics,
+  chatMessages,
   type Persona,
   type InsertPersona,
   type ApiKey,
@@ -8,6 +12,9 @@ import {
   type InsertChatMessage,
   type PersonaWithStats,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, sql } from "drizzle-orm";
+import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -23,10 +30,12 @@ export interface IStorage {
   // API Keys
   getAllApiKeys(): Promise<ApiKey[]>;
   getApiKey(id: string): Promise<ApiKey | undefined>;
-  getApiKeyByKey(key: string): Promise<ApiKey | undefined>;
-  createApiKey(apiKey: InsertApiKey): Promise<ApiKey>;
+  getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined>;
+  createApiKey(apiKey: InsertApiKey, plainTextKey: string, keyHash: string): Promise<{ apiKey: ApiKey; plainTextKey: string }>;
   deleteApiKey(id: string): Promise<boolean>;
   updateApiKeyLastUsed(id: string): Promise<void>;
+  toggleApiKeyStatus(id: string, isActive: boolean): Promise<ApiKey | undefined>;
+  regenerateApiKey(id: string, newPlainTextKey: string, newKeyHash: string): Promise<{ apiKey: ApiKey; plainTextKey: string }>;
 
   // Analytics
   getAnalyticsByPersona(personaId: string): Promise<Analytics[]>;
@@ -38,157 +47,151 @@ export interface IStorage {
   }): Promise<Analytics>;
 
   // Chat Messages
-  getChatMessages(personaId: string): Promise<ChatMessage[]>;
+  getChatMessages(personaId: string, sessionId?: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
-  clearChatMessages(personaId: string): Promise<void>;
+  clearChatMessages(personaId: string, sessionId?: string): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private personas: Map<string, Persona>;
-  private apiKeys: Map<string, ApiKey>;
-  private analytics: Map<string, Analytics>;
-  private chatMessages: Map<string, ChatMessage>;
-
-  constructor() {
-    this.personas = new Map();
-    this.apiKeys = new Map();
-    this.analytics = new Map();
-    this.chatMessages = new Map();
-  }
-
+export class DatabaseStorage implements IStorage {
   async getAllPersonas(): Promise<PersonaWithStats[]> {
-    const personaArray = Array.from(this.personas.values());
+    const allPersonas = await db.select().from(personas);
     
-    return personaArray.map((persona) => {
-      const personaAnalytics = Array.from(this.analytics.values()).filter(
-        (a) => a.personaId === persona.id
-      );
-      const totalRequests = personaAnalytics.reduce((sum, a) => sum + a.requestCount, 0);
-      const totalTokens = personaAnalytics.reduce((sum, a) => sum + a.tokensUsed, 0);
-      const apiKeyCount = Array.from(this.apiKeys.values()).filter(
-        (k) => k.personaId === persona.id
-      ).length;
+    const personasWithStats = await Promise.all(
+      allPersonas.map(async (persona) => {
+        const personaAnalytics = await db
+          .select({
+            totalRequests: sql<number>`COALESCE(SUM(${analytics.requestCount}), 0)`,
+            totalTokens: sql<number>`COALESCE(SUM(${analytics.tokensUsed}), 0)`,
+          })
+          .from(analytics)
+          .where(eq(analytics.personaId, persona.id));
 
-      return {
-        ...persona,
-        totalRequests,
-        totalTokens,
-        apiKeyCount,
-      };
-    });
+        const apiKeyCount = await db
+          .select({ count: sql<number>`COUNT(*)` })
+          .from(apiKeys)
+          .where(eq(apiKeys.personaId, persona.id));
+
+        return {
+          ...persona,
+          totalRequests: Number(personaAnalytics[0]?.totalRequests || 0),
+          totalTokens: Number(personaAnalytics[0]?.totalTokens || 0),
+          apiKeyCount: Number(apiKeyCount[0]?.count || 0),
+        };
+      })
+    );
+
+    return personasWithStats;
   }
 
   async getPersona(id: string): Promise<Persona | undefined> {
-    return this.personas.get(id);
-  }
-
-  async createPersona(insertPersona: InsertPersona): Promise<Persona> {
-    const id = randomUUID();
-    const now = new Date();
-    const persona: Persona = {
-      ...insertPersona,
-      id,
-      isPublished: insertPersona.isPublished ?? 0,
-      currentVersion: insertPersona.currentVersion ?? 1,
-      createdAt: now,
-      updatedAt: now,
-    };
-    this.personas.set(id, persona);
+    const [persona] = await db.select().from(personas).where(eq(personas.id, id));
     return persona;
   }
 
-  async updatePersona(
-    id: string,
-    updates: Partial<InsertPersona>
-  ): Promise<Persona | undefined> {
-    const persona = this.personas.get(id);
-    if (!persona) return undefined;
+  async createPersona(insertPersona: InsertPersona): Promise<Persona> {
+    const [persona] = await db.insert(personas).values(insertPersona).returning();
+    return persona;
+  }
 
-    const updated: Persona = {
-      ...persona,
-      ...updates,
-      updatedAt: new Date(),
-    };
-    this.personas.set(id, updated);
+  async updatePersona(id: string, updates: Partial<InsertPersona>): Promise<Persona | undefined> {
+    const [updated] = await db
+      .update(personas)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(personas.id, id))
+      .returning();
     return updated;
   }
 
   async deletePersona(id: string): Promise<boolean> {
-    return this.personas.delete(id);
+    const result = await db.delete(personas).where(eq(personas.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   async publishPersona(id: string): Promise<Persona | undefined> {
-    const persona = this.personas.get(id);
-    if (!persona) return undefined;
-
-    const updated: Persona = {
-      ...persona,
-      isPublished: 1,
-      updatedAt: new Date(),
-    };
-    this.personas.set(id, updated);
+    const [updated] = await db
+      .update(personas)
+      .set({ isPublished: 1, updatedAt: new Date() })
+      .where(eq(personas.id, id))
+      .returning();
     return updated;
   }
 
   async unpublishPersona(id: string): Promise<Persona | undefined> {
-    const persona = this.personas.get(id);
-    if (!persona) return undefined;
-
-    const updated: Persona = {
-      ...persona,
-      isPublished: 0,
-      updatedAt: new Date(),
-    };
-    this.personas.set(id, updated);
+    const [updated] = await db
+      .update(personas)
+      .set({ isPublished: 0, updatedAt: new Date() })
+      .where(eq(personas.id, id))
+      .returning();
     return updated;
   }
 
   async getAllApiKeys(): Promise<ApiKey[]> {
-    return Array.from(this.apiKeys.values());
+    return await db.select().from(apiKeys);
   }
 
   async getApiKey(id: string): Promise<ApiKey | undefined> {
-    return this.apiKeys.get(id);
-  }
-
-  async getApiKeyByKey(key: string): Promise<ApiKey | undefined> {
-    return Array.from(this.apiKeys.values()).find((k) => k.key === key);
-  }
-
-  async createApiKey(insertApiKey: InsertApiKey): Promise<ApiKey> {
-    const id = randomUUID();
-    const key = `fai_${randomUUID().replace(/-/g, "")}`;
-    const now = new Date();
-    
-    const apiKey: ApiKey = {
-      ...insertApiKey,
-      id,
-      key,
-      createdAt: now,
-      lastUsedAt: null,
-    };
-    this.apiKeys.set(id, apiKey);
+    const [apiKey] = await db.select().from(apiKeys).where(eq(apiKeys.id, id));
     return apiKey;
   }
 
+  async getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined> {
+    const [apiKey] = await db.select().from(apiKeys).where(eq(apiKeys.keyHash, keyHash));
+    return apiKey;
+  }
+
+  async createApiKey(
+    insertApiKey: InsertApiKey,
+    plainTextKey: string,
+    keyHash: string
+  ): Promise<{ apiKey: ApiKey; plainTextKey: string }> {
+    const [apiKey] = await db
+      .insert(apiKeys)
+      .values({
+        ...insertApiKey,
+        keyHash,
+      })
+      .returning();
+    
+    return { apiKey, plainTextKey };
+  }
+
   async deleteApiKey(id: string): Promise<boolean> {
-    return this.apiKeys.delete(id);
+    const result = await db.delete(apiKeys).where(eq(apiKeys.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   async updateApiKeyLastUsed(id: string): Promise<void> {
-    const apiKey = this.apiKeys.get(id);
-    if (apiKey) {
-      this.apiKeys.set(id, {
-        ...apiKey,
-        lastUsedAt: new Date(),
-      });
-    }
+    await db
+      .update(apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(apiKeys.id, id));
+  }
+
+  async toggleApiKeyStatus(id: string, isActive: boolean): Promise<ApiKey | undefined> {
+    const [updated] = await db
+      .update(apiKeys)
+      .set({ isActive })
+      .where(eq(apiKeys.id, id))
+      .returning();
+    return updated;
+  }
+
+  async regenerateApiKey(
+    id: string,
+    newPlainTextKey: string,
+    newKeyHash: string
+  ): Promise<{ apiKey: ApiKey; plainTextKey: string }> {
+    const [updated] = await db
+      .update(apiKeys)
+      .set({ keyHash: newKeyHash })
+      .where(eq(apiKeys.id, id))
+      .returning();
+    
+    return { apiKey: updated, plainTextKey: newPlainTextKey };
   }
 
   async getAnalyticsByPersona(personaId: string): Promise<Analytics[]> {
-    return Array.from(this.analytics.values()).filter(
-      (a) => a.personaId === personaId
-    );
+    return await db.select().from(analytics).where(eq(analytics.personaId, personaId));
   }
 
   async createAnalytics(data: {
@@ -197,43 +200,58 @@ export class MemStorage implements IStorage {
     tokensUsed: number;
     requestCount: number;
   }): Promise<Analytics> {
-    const id = randomUUID();
-    const analytics: Analytics = {
-      id,
-      personaId: data.personaId,
-      apiKeyId: data.apiKeyId || null,
-      tokensUsed: data.tokensUsed,
-      requestCount: data.requestCount,
-      timestamp: new Date(),
-    };
-    this.analytics.set(id, analytics);
-    return analytics;
+    const [created] = await db
+      .insert(analytics)
+      .values({
+        personaId: data.personaId,
+        apiKeyId: data.apiKeyId || null,
+        tokensUsed: data.tokensUsed,
+        requestCount: data.requestCount,
+      })
+      .returning();
+    return created;
   }
 
-  async getChatMessages(personaId: string): Promise<ChatMessage[]> {
-    return Array.from(this.chatMessages.values())
-      .filter((m) => m.personaId === personaId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  async getChatMessages(personaId: string, sessionId?: string): Promise<ChatMessage[]> {
+    if (sessionId) {
+      return await db
+        .select()
+        .from(chatMessages)
+        .where(
+          and(
+            eq(chatMessages.personaId, personaId),
+            eq(chatMessages.sessionId, sessionId)
+          )
+        )
+        .orderBy(chatMessages.createdAt);
+    }
+    
+    return await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.personaId, personaId))
+      .orderBy(chatMessages.createdAt);
   }
 
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
-    const id = randomUUID();
-    const message: ChatMessage = {
-      ...insertMessage,
-      id,
-      createdAt: new Date(),
-    };
-    this.chatMessages.set(id, message);
+    const [message] = await db.insert(chatMessages).values(insertMessage).returning();
     return message;
   }
 
-  async clearChatMessages(personaId: string): Promise<void> {
-    const messagesToDelete = Array.from(this.chatMessages.entries())
-      .filter(([, m]) => m.personaId === personaId)
-      .map(([id]) => id);
-
-    messagesToDelete.forEach((id) => this.chatMessages.delete(id));
+  async clearChatMessages(personaId: string, sessionId?: string): Promise<void> {
+    if (sessionId) {
+      await db
+        .delete(chatMessages)
+        .where(
+          and(
+            eq(chatMessages.personaId, personaId),
+            eq(chatMessages.sessionId, sessionId)
+          )
+        );
+    } else {
+      await db.delete(chatMessages).where(eq(chatMessages.personaId, personaId));
+    }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
