@@ -7,8 +7,27 @@ import { generateSystemPrompt, getChatCompletion } from "./gemini";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import { rateLimiter } from "./rate-limiter";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Replit Auth - Reference: blueprint:javascript_log_in_with_replit
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
   // Personas
   app.get("/api/personas", async (req, res) => {
     try {

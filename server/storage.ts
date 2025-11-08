@@ -3,6 +3,7 @@ import {
   apiKeys,
   analytics,
   chatMessages,
+  users,
   type Persona,
   type InsertPersona,
   type ApiKey,
@@ -11,6 +12,8 @@ import {
   type ChatMessage,
   type InsertChatMessage,
   type PersonaWithStats,
+  type User,
+  type UpsertUser,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -18,6 +21,10 @@ import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
+  // User operations - Required for Replit Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+
   // Personas
   getAllPersonas(): Promise<PersonaWithStats[]>;
   getPersona(id: string): Promise<Persona | undefined>;
@@ -53,6 +60,27 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // User operations - Required for Replit Auth
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
   async getAllPersonas(): Promise<PersonaWithStats[]> {
     const allPersonas = await db.select().from(personas);
     
