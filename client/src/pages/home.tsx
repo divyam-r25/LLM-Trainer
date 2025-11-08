@@ -372,7 +372,7 @@ export default function Home() {
                     custom AI personas
                   </span>
                   <br />
-                  <span className="text-foreground text-[64px]">in minutes.</span>
+                  <span className="text-foreground text-[60px]">in minutes.</span>
                 </h1>
                 
                 <p className="lg:text-2xl text-muted-foreground max-w-xl text-[20px]" data-testid="text-hero-subtitle">
