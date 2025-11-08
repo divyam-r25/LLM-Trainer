@@ -375,7 +375,7 @@ export default function Home() {
                   <span className="text-foreground text-[64px]">in minutes.</span>
                 </h1>
                 
-                <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-xl" data-testid="text-hero-subtitle">
+                <p className="lg:text-2xl text-muted-foreground max-w-xl text-[20px]" data-testid="text-hero-subtitle">
                   ForgeAI lets you build specialized AI assistants for your business or app - no fine-tuning required.
                 </p>
               </div>
