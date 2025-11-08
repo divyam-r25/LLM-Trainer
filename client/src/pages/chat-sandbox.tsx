@@ -45,15 +45,20 @@ export default function ChatSandbox() {
       ]);
       setInput("");
     },
-    onError: async (error: any) => {
+    onError: (error: any) => {
       let errorMessage = "Failed to send message";
       
-      if (error?.response) {
-        try {
-          const errorData = await error.response.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch {
-          errorMessage = error.response.statusText || errorMessage;
+      if (error?.message) {
+        const match = error.message.match(/:\s*({.*})/);
+        if (match) {
+          try {
+            const errorData = JSON.parse(match[1]);
+            errorMessage = errorData.error || errorMessage;
+          } catch {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message.replace(/^\d+:\s*/, '');
         }
       }
       
