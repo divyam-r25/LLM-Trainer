@@ -45,6 +45,7 @@ export const personas = pgTable("personas", {
 // API Keys table - stores generated API keys for accessing personas
 export const apiKeys = pgTable("api_keys", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   keyHash: text("key_hash").notNull().unique(),
   personaId: varchar("persona_id").notNull().references(() => personas.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -123,6 +124,7 @@ export const insertApiKeySchema = createInsertSchema(apiKeys, {
   name: z.string().min(1, "API key name is required"),
 }).omit({
   id: true,
+  userId: true,
   keyHash: true,
   createdAt: true,
   lastUsedAt: true,

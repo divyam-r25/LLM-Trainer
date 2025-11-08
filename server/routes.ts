@@ -1,8 +1,8 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertPersonaSchema, insertApiKeySchema, type ChatRequest, type ChatResponse, personas } from "@shared/schema";
+import { insertPersonaSchema, insertApiKeySchema, type ChatRequest, type ChatResponse, personas, apiKeys } from "@shared/schema";
 import { generateSystemPrompt, getChatCompletion } from "./gemini";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
@@ -11,12 +11,30 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
+// Type for authenticated requests with validated OIDC user claims
+// The isAuthenticated middleware validates JWT tokens server-side via Replit OIDC
+// and sets req.user after successful validation. This type ensures type safety
+// when accessing authenticated user data in protected routes.
+interface AuthenticatedRequest extends Request {
+  user: {
+    claims: {
+      sub: string;  // User ID from OIDC provider (validated by Replit Auth)
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+    };
+    access_token?: string;
+    refresh_token?: string;
+    expires_at?: number;
+  };
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth - Reference: blueprint:javascript_log_in_with_replit
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -31,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Personas (Protected - require authentication)
-  app.get("/api/personas", isAuthenticated, async (req: any, res) => {
+  app.get("/api/personas", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const personas = await storage.getAllPersonas(userId);
@@ -41,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/personas/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/personas/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const persona = await storage.getPersona(req.params.id, userId);
@@ -54,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/personas", isAuthenticated, async (req: any, res) => {
+  app.post("/api/personas", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const data = insertPersonaSchema.parse(req.body);
@@ -80,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/personas/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const data = insertPersonaSchema.partial().parse(req.body);
@@ -117,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/personas/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/personas/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const deleted = await storage.deletePersona(req.params.id, userId);
@@ -130,7 +148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id/publish", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/personas/:id/publish", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const persona = await storage.publishPersona(req.params.id, userId);
@@ -143,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id/unpublish", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/personas/:id/unpublish", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const persona = await storage.unpublishPersona(req.params.id, userId);
@@ -157,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat (Sandbox)
-  app.get("/api/chat/:personaId/history", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/:personaId/history", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const { personaId } = req.params;
@@ -179,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/chat", isAuthenticated, async (req: any, res) => {
+  app.post("/api/chat", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const { message, personaId, sessionId } = req.body as ChatRequest;
@@ -252,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/chat/:personaId/clear", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/chat/:personaId/clear", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.claims.sub;
       const { personaId } = req.params;
@@ -283,9 +301,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const plainTextKey = authHeader.substring(7);
-      const keyHash = await bcrypt.hash(plainTextKey, 10);
       
-      const allKeys = await storage.getAllApiKeys();
+      // Public API - For authentication, we need to check ALL keys (not filtered by userId)
+      // because this is a public endpoint accessed via API key
+      // We query the database directly to get all keys, then compare hashes
+      const allKeys = await db.select().from(apiKeys);
       let keyRecord = null;
       
       for (const key of allKeys) {
@@ -317,7 +337,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader("X-RateLimit-Remaining", rateLimit.remaining.toString());
       res.setHeader("X-RateLimit-Reset", new Date(rateLimit.resetTime).toISOString());
 
-      // For public API, we don't filter by userId but check if published
+      // Public API endpoint does not filter by userId (intentional)
+      // This endpoint is meant for external access via API key authentication
+      // We query the database directly instead of using storage.getPersona()
+      // because getPersona() requires userId filtering for security
+      // Here we only check: (1) persona exists, (2) persona is published
       const [personaResult] = await db.select().from(personas).where(eq(personas.id, personaId));
       if (!personaResult) {
         return res.status(404).json({ error: "Persona not found" });
@@ -360,23 +384,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // API Keys
-  app.get("/api/api-keys", isAuthenticated, async (req, res) => {
+  app.get("/api/api-keys", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const keys = await storage.getAllApiKeys();
+      const userId = req.user.claims.sub;
+      const keys = await storage.getAllApiKeys(userId);
       res.json(keys);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch API keys" });
     }
   });
 
-  app.post("/api/api-keys", isAuthenticated, async (req, res) => {
+  app.post("/api/api-keys", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
+      const userId = req.user.claims.sub;
       const data = insertApiKeySchema.parse(req.body);
       
       const plainTextKey = `fai_${randomUUID().replace(/-/g, "")}`;
       const keyHash = await bcrypt.hash(plainTextKey, 10);
       
-      const result = await storage.createApiKey(data, plainTextKey, keyHash);
+      const result = await storage.createApiKey(data, userId, plainTextKey, keyHash);
       
       res.status(201).json({
         ...result.apiKey,
@@ -390,12 +416,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/api-keys/:id/regenerate", isAuthenticated, async (req, res) => {
+  app.patch("/api/api-keys/:id/regenerate", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
+      const userId = req.user.claims.sub;
       const plainTextKey = `fai_${randomUUID().replace(/-/g, "")}`;
       const keyHash = await bcrypt.hash(plainTextKey, 10);
       
-      const result = await storage.regenerateApiKey(req.params.id, plainTextKey, keyHash);
+      const result = await storage.regenerateApiKey(req.params.id, userId, plainTextKey, keyHash);
       
       if (!result.apiKey) {
         return res.status(404).json({ error: "API key not found" });
@@ -410,15 +437,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/api-keys/:id/toggle", isAuthenticated, async (req, res) => {
+  app.patch("/api/api-keys/:id/toggle", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
+      const userId = req.user.claims.sub;
       const { isActive } = req.body;
       
       if (typeof isActive !== "boolean") {
         return res.status(400).json({ error: "isActive must be a boolean" });
       }
       
-      const apiKey = await storage.toggleApiKeyStatus(req.params.id, isActive);
+      const apiKey = await storage.toggleApiKeyStatus(req.params.id, isActive, userId);
       
       if (!apiKey) {
         return res.status(404).json({ error: "API key not found" });
@@ -430,9 +458,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/api-keys/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/api-keys/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const deleted = await storage.deleteApiKey(req.params.id);
+      const userId = req.user.claims.sub;
+      const deleted = await storage.deleteApiKey(req.params.id, userId);
       if (!deleted) {
         return res.status(404).json({ error: "API key not found" });
       }

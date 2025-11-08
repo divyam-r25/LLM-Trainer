@@ -35,14 +35,14 @@ export interface IStorage {
   unpublishPersona(id: string, userId: string): Promise<Persona | undefined>;
 
   // API Keys
-  getAllApiKeys(): Promise<ApiKey[]>;
-  getApiKey(id: string): Promise<ApiKey | undefined>;
-  getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined>;
-  createApiKey(apiKey: InsertApiKey, plainTextKey: string, keyHash: string): Promise<{ apiKey: ApiKey; plainTextKey: string }>;
-  deleteApiKey(id: string): Promise<boolean>;
-  updateApiKeyLastUsed(id: string): Promise<void>;
-  toggleApiKeyStatus(id: string, isActive: boolean): Promise<ApiKey | undefined>;
-  regenerateApiKey(id: string, newPlainTextKey: string, newKeyHash: string): Promise<{ apiKey: ApiKey; plainTextKey: string }>;
+  getAllApiKeys(userId: string): Promise<ApiKey[]>;
+  getApiKey(id: string, userId: string): Promise<ApiKey | undefined>;
+  getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined>;  // Public API - no userId filter
+  createApiKey(apiKey: InsertApiKey, userId: string, plainTextKey: string, keyHash: string): Promise<{ apiKey: ApiKey; plainTextKey: string }>;
+  deleteApiKey(id: string, userId: string): Promise<boolean>;
+  updateApiKeyLastUsed(id: string): Promise<void>;  // Internal only - no userId filter
+  toggleApiKeyStatus(id: string, isActive: boolean, userId: string): Promise<ApiKey | undefined>;
+  regenerateApiKey(id: string, userId: string, newPlainTextKey: string, newKeyHash: string): Promise<{ apiKey: ApiKey; plainTextKey: string }>;
 
   // Analytics
   getAnalyticsByPersona(personaId: string): Promise<Analytics[]>;
@@ -155,22 +155,24 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async getAllApiKeys(): Promise<ApiKey[]> {
-    return await db.select().from(apiKeys);
+  async getAllApiKeys(userId: string): Promise<ApiKey[]> {
+    return await db.select().from(apiKeys).where(eq(apiKeys.userId, userId));
   }
 
-  async getApiKey(id: string): Promise<ApiKey | undefined> {
-    const [apiKey] = await db.select().from(apiKeys).where(eq(apiKeys.id, id));
+  async getApiKey(id: string, userId: string): Promise<ApiKey | undefined> {
+    const [apiKey] = await db.select().from(apiKeys).where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)));
     return apiKey;
   }
 
   async getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined> {
+    // Public API endpoint - no userId filtering required
     const [apiKey] = await db.select().from(apiKeys).where(eq(apiKeys.keyHash, keyHash));
     return apiKey;
   }
 
   async createApiKey(
     insertApiKey: InsertApiKey,
+    userId: string,
     plainTextKey: string,
     keyHash: string
   ): Promise<{ apiKey: ApiKey; plainTextKey: string }> {
@@ -178,6 +180,7 @@ export class DatabaseStorage implements IStorage {
       .insert(apiKeys)
       .values({
         ...insertApiKey,
+        userId,
         keyHash,
       })
       .returning();
@@ -185,36 +188,38 @@ export class DatabaseStorage implements IStorage {
     return { apiKey, plainTextKey };
   }
 
-  async deleteApiKey(id: string): Promise<boolean> {
-    const result = await db.delete(apiKeys).where(eq(apiKeys.id, id));
+  async deleteApiKey(id: string, userId: string): Promise<boolean> {
+    const result = await db.delete(apiKeys).where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
   async updateApiKeyLastUsed(id: string): Promise<void> {
+    // Internal use only - called after public API validates key
     await db
       .update(apiKeys)
       .set({ lastUsedAt: new Date() })
       .where(eq(apiKeys.id, id));
   }
 
-  async toggleApiKeyStatus(id: string, isActive: boolean): Promise<ApiKey | undefined> {
+  async toggleApiKeyStatus(id: string, isActive: boolean, userId: string): Promise<ApiKey | undefined> {
     const [updated] = await db
       .update(apiKeys)
       .set({ isActive })
-      .where(eq(apiKeys.id, id))
+      .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)))
       .returning();
     return updated;
   }
 
   async regenerateApiKey(
     id: string,
+    userId: string,
     newPlainTextKey: string,
     newKeyHash: string
   ): Promise<{ apiKey: ApiKey; plainTextKey: string }> {
     const [updated] = await db
       .update(apiKeys)
       .set({ keyHash: newKeyHash })
-      .where(eq(apiKeys.id, id))
+      .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)))
       .returning();
     
     return { apiKey: updated, plainTextKey: newPlainTextKey };
