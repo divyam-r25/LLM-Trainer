@@ -12,7 +12,7 @@ export default function NotFound() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <Button asChild className="mt-6">
-          <Link href="/">
+          <Link href="/dashboard">
             <Home className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
