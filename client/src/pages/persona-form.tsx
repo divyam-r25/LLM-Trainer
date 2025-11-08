@@ -7,7 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, X, Save, Sparkles } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Plus, X, Save, Sparkles, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -97,6 +108,30 @@ export default function PersonaForm() {
       toast({
         title: "Error",
         description: "Failed to update persona",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", `/api/personas/${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to delete persona");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/personas"] });
+      toast({
+        title: "Success",
+        description: "Persona deleted successfully",
+      });
+      setLocation("/");
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete persona",
         variant: "destructive",
       });
     },
@@ -325,23 +360,59 @@ export default function PersonaForm() {
             </CardContent>
           </Card>
 
-          <div className="flex gap-3 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setLocation("/")}
-              data-testid="button-cancel"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isPending}
-              data-testid="button-save"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {isEdit ? "Update Persona" : "Create Persona"}
-            </Button>
+          <div className="flex gap-3 justify-between">
+            {isEdit && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={deleteMutation.isPending}
+                    data-testid="button-delete"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Persona</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete "{persona?.name}"? This action cannot be undone.
+                      All associated data, including API keys and analytics, will be permanently removed.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel data-testid="button-delete-cancel">Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteMutation.mutate()}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      data-testid="button-delete-confirm"
+                    >
+                      Delete Persona
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            <div className="flex gap-3 ml-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setLocation("/")}
+                data-testid="button-cancel"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isPending}
+                data-testid="button-save"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {isEdit ? "Update Persona" : "Create Persona"}
+              </Button>
+            </div>
           </div>
         </form>
       </Form>
