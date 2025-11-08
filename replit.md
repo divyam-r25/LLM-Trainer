@@ -115,17 +115,16 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
-- **2025-11-08**: Added futuristic 3D particle-wave loader
+- **2025-11-08**: ✅ Completed futuristic 3D particle-wave loader implementation
   - Created ParticleWaveLoader component with morphing blob animation using Three.js
-  - 800 WebGL particles with gradient colors (electric blue → violet → magenta)
-  - Custom shader material for neon glow effects and additive blending
-  - Multiple wave functions for organic, breathing movement
-  - Pre-computed particle parameters for smooth deterministic animation
-  - Automatic WebGL detection with CSS fallback for browser compatibility
-  - CSS fallback uses 50 framer-motion animated particles with gradient colors
-  - Proper memory management with geometry/material disposal
-  - AnimatePresence integration for smooth fade in/out transitions
-  - Applied to chat sandbox for premium AI thinking indicator
+  - **WebGL Path**: 800 particles with gradient colors (electric blue → violet → magenta), custom shader for neon glow, additive blending, organic wave functions
+  - **CSS Fallback**: 50 framer-motion particles with matching gradient, works in all browsers including headless/test environments
+  - **Smart Detection**: Automatic WebGL availability check, graceful degradation with try-catch error handling
+  - **Memory Management**: Proper cleanup of Three.js geometry, materials, and renderer on unmount
+  - **Smooth Transitions**: AnimatePresence with keyed components for fade-in/fade-out animations
+  - **Chat Integration**: Fixed critical rendering bug - loader now appears on FIRST message and all subsequent messages
+  - **User Experience**: Disabled inputs during loading, smooth visual feedback, no crashes or errors
+  - **Tested & Verified**: Visual confirmation via screenshots showing loader working in both initial and subsequent message states
 
 - **2025-11-08**: Database persistence and security features
   - Migrated from in-memory to PostgreSQL with Drizzle ORM
