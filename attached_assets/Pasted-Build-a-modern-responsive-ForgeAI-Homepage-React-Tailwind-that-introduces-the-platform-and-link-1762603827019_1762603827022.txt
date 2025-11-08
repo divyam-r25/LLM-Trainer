@@ -1,0 +1,148 @@
+Build a modern, responsive ForgeAI Homepage (React + Tailwind) that introduces the platform and links to the dashboard.
+
+Overall Theme
+
+Design language and spacing should match the ForgeAI Dashboard (as shown in the uploaded image).
+
+Use a Linear.app / Vercel-style minimal developer aesthetic.
+
+Maintain consistency in button styles, font (Inter + JetBrains Mono), and spacing.
+
+Default color palette:
+
+Primary Blue: #2563EB
+
+Deep Blue: #1E40AF
+
+Background: #F9FAFB
+
+Text: #0F172A
+
+Card Surface: #FFFFFF
+
+Secondary Text: #475569
+
+Page Structure
+1. Navigation Bar
+
+Fixed top navbar with light blur background.
+
+Left: ForgeAI logo and brand name.
+
+Right: Navigation links — Features, Testimonials, Docs, Login / Get Started.
+
+“Get Started” button uses primary blue accent.
+
+2. Hero Section (Top of Page)
+
+Layout:
+
+Left:
+
+Headline: “Train. Test. Deploy custom AI personas — in minutes.”
+
+Subtext: “ForgeAI lets you build specialized AI assistants for your business or app — no fine-tuning required.”
+
+Two buttons:
+
+“Start Free Trial” → leads to /create if logged in, /login if not.
+
+“View Demo” → smooth scroll to “Trial” section.
+
+Right:
+
+Mockup image of dashboard or animated persona cards.
+
+Optional Animation: Typing dots or floating personas.
+
+3. Why ForgeAI Section
+
+3 responsive feature cards horizontally aligned.
+
+🧠 No Fine-Tuning Needed – Build specialized behavior instantly.
+
+⚡ Real-Time Testing – Test persona live before deployment.
+
+🚀 API-Ready Deployment – Publish and integrate anywhere.
+
+Subtle hover effect on cards.
+
+4. Feature Comparison: “ForgeAI vs Manual Prompting”
+
+Title: “Why ForgeAI Beats Manual Prompting”
+2-column table or cards:
+
+Criteria	ForgeAI	Manual Prompting
+Setup Time	Minutes	Hours
+Consistency	Always identical output	Varies per prompt
+Versioning	Automatic	Manual tracking
+API Integration	Built-in	Custom scripting
+Reusability	One-click	Copy-paste every time
+Analytics	Included	None
+
+Style:
+
+Clean table or side-by-side cards.
+
+ForgeAI column highlighted with blue accent.
+
+5. Trial Section (Interactive Persona Creator Preview)
+
+Layout:
+
+Left:
+
+Inputs: Persona Name, Intent, Few-shot Example.
+
+“Simulate Persona” button.
+
+If not logged in → show login redirect popup.
+
+Right:
+
+Simulated AI response preview box (system prompt sample or short chat).
+
+Goal: Give new users a taste of persona creation.
+
+6. Testimonials Section
+
+Title: “Trusted by developers, startups, and creators.”
+
+3–4 testimonial cards with user photos, quotes, and roles.
+
+Optionally add small brand logos.
+
+7. Footer
+
+Brand logo and tagline: “Shape how your AI thinks.”
+
+Quick Links: Dashboard | Docs | API | GitHub | Contact.
+
+Social Icons: LinkedIn, GitHub, Twitter.
+
+Footer Note: “© 2025 ForgeAI. Built with ❤️ during Vibeathon Hackathon.”
+
+Responsive Behavior
+
+Fully responsive for desktop, tablet, and mobile.
+
+Navbar collapses into a hamburger menu on mobile.
+
+Sections use consistent vertical spacing (py-20, px-8).
+
+Functional Requirements
+
+Login check: If user clicks “Start Free Trial” or tries trial creation → redirect to login if not authenticated.
+
+Smooth scroll for navigation links (react-scroll or native scroll behavior).
+
+Reuse your existing dashboard theme for fonts and buttons.
+
+Optional dark mode toggle (if time allows).
+
+Expected Output
+
+A single React page (Home.jsx or HomePage.jsx) that visually matches the dashboard aesthetic, includes all sections described above, and connects “Start Free Trial” and “Create Persona” to the existing dashboard flow.
+
+Priority: High
+Goal: First impression for users + hackathon presentation landing page
