@@ -115,6 +115,12 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
+- **2025-11-08**: ✅ Simplified navigation structure
+  - Removed redundant "Personas" menu item from sidebar
+  - Dashboard is the main hub for all persona management
+  - Cleaner navigation: Dashboard, Analytics, API Keys
+  - Removed duplicate `/personas` route
+
 - **2025-11-08**: ✅ Added delete functionality to persona edit page
   - Delete button with confirmation dialog in edit mode
   - AlertDialog warns about permanent deletion and shows persona name

@@ -21,7 +21,6 @@ function Router() {
       <Route path="/personas/:id/edit" component={PersonaForm} />
       <Route path="/personas/:id/test" component={ChatSandbox} />
       <Route path="/personas/:id/deploy" component={PersonaDeploy} />
-      <Route path="/personas" component={Dashboard} />
       <Route path="/api-keys" component={ApiKeys} />
       <Route path="/analytics" component={Analytics} />
       <Route component={NotFound} />

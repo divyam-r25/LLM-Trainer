@@ -19,11 +19,6 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Personas",
-    url: "/personas",
-    icon: Sparkles,
-  },
-  {
     title: "Analytics",
     url: "/analytics",
     icon: BarChart3,
