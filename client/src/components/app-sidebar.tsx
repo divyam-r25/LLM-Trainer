@@ -149,7 +149,7 @@ export function AppSidebar() {
               >
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.profileImageUrl || undefined} alt={user.email || "User"} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                  <AvatarFallback className="bg-accent text-primary text-xs font-semibold">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
