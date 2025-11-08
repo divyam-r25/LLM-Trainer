@@ -115,13 +115,13 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
-- **2025-11-08**: ✅ Updated ForgeAI Logo
+- **2025-11-08**: ✅ Updated ForgeAI Logo and Hero Section
   - Replaced previous logo with new custom ForgeAI logo (8bfed827-52ba-46fb-8296-0158062c5b28_1762612473771.jpg)
-  - Updated all four logo locations: navigation bar, hero section, footer, and sidebar
+  - Updated logo locations: navigation bar, footer, and sidebar
   - Logo import updated in home.tsx and app-sidebar.tsx
-  - All logos display with `object-contain` class for proper scaling
-  - Logo sizes: 8x8px (nav/footer/sidebar), 64x64px (hero section)
-  - E2E tested: all logos render correctly across the application
+  - Removed large logo element from hero section right column
+  - Logo sizes: 8x8px (nav/footer/sidebar)
+  - E2E tested: navigation and footer logos display correctly, hero section shows decorative elements only
 
 - **2025-11-08**: ✅ Implemented Complete Authentication System with Replit Auth
   - **Backend Authentication**:
