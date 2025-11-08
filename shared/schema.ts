@@ -30,6 +30,7 @@ export const users = pgTable("users", {
 // Personas table - stores AI persona configurations
 export const personas = pgTable("personas", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description").notNull(),
   intent: text("intent").notNull(),

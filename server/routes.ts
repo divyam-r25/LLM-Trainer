@@ -50,8 +50,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/personas", isAuthenticated, async (req, res) => {
+  app.post("/api/personas", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const data = insertPersonaSchema.parse(req.body);
       
       const systemPrompt = await generateSystemPrompt({
@@ -62,6 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const persona = await storage.createPersona({
         ...data,
+        userId,
         systemPrompt,
       });
 
@@ -423,6 +425,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete API key" });
+    }
+  });
+
+  // Trainers (Alias routes for /api/personas - for spec compatibility)
+  app.get("/api/trainers", isAuthenticated, async (req, res) => {
+    return app._router.handle(Object.assign(req, { url: "/api/personas" }), res);
+  });
+
+  app.get("/api/trainers/:id", isAuthenticated, async (req, res) => {
+    return app._router.handle(Object.assign(req, { url: `/api/personas/${req.params.id}` }), res);
+  });
+
+  app.post("/api/trainers", isAuthenticated, async (req, res) => {
+    return app._router.handle(Object.assign(req, { url: "/api/personas" }), res);
+  });
+
+  app.put("/api/trainers/:id", isAuthenticated, async (req, res) => {
+    return app._router.handle(Object.assign(req, { url: `/api/personas/${req.params.id}`, method: "PATCH" }), res);
+  });
+
+  // Simulate training endpoint - previews system prompt generation
+  app.post("/api/trainers/simulate", isAuthenticated, async (req, res) => {
+    try {
+      const { name, intent, examples } = req.body;
+      
+      if (!name || !intent) {
+        return res.status(400).json({ error: "Name and intent are required" });
+      }
+
+      const systemPrompt = await generateSystemPrompt({
+        name,
+        intent,
+        examples: examples || [],
+      });
+
+      res.json({ systemPrompt });
+    } catch (error) {
+      console.error("Simulate training error:", error);
+      res.status(500).json({ error: "Failed to generate system prompt" });
     }
   });
 
