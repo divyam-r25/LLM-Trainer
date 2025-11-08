@@ -12,7 +12,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { AILoadingSpinner } from "@/components/ai-loading-spinner";
+import { ParticleWaveLoader } from "@/components/particle-wave-loader";
+import { AnimatePresence } from "framer-motion";
 
 interface Message {
   role: "user" | "assistant";
@@ -254,16 +255,13 @@ export default function ChatSandbox() {
                       )}
                     </div>
                   ))}
-                  {sendMutation.isPending && (
-                    <div className="flex gap-3 justify-start items-start" data-testid="message-loading">
-                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                        <Bot className="w-4 h-4 text-primary-foreground" />
+                  <AnimatePresence mode="wait">
+                    {sendMutation.isPending && (
+                      <div className="flex justify-center w-full my-8" data-testid="message-loading">
+                        <ParticleWaveLoader />
                       </div>
-                      <div className="bg-muted/50 rounded-lg p-6">
-                        <AILoadingSpinner size="sm" />
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </AnimatePresence>
                   <div ref={scrollRef} />
                 </div>
               )}

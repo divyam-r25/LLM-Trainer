@@ -42,6 +42,15 @@ export function ParticleWaveLoader({ onComplete }: ParticleWaveLoaderProps) {
     const colors = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
 
+    // Pre-compute particle parameters for smooth animation
+    const particleData: Array<{
+      baseRadius: number;
+      theta: number;
+      phi: number;
+      waveOffset1: number;
+      waveOffset2: number;
+    }> = [];
+
     // Color gradient: electric blue -> violet -> magenta
     const colorStops = [
       new THREE.Color(0x00d4ff), // Electric blue
@@ -53,14 +62,24 @@ export function ParticleWaveLoader({ onComplete }: ParticleWaveLoaderProps) {
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
       
-      // Create blob shape using spherical coordinates with noise
-      const radius = 30 + Math.random() * 20;
+      // Pre-compute base values for each particle (used throughout animation)
+      const baseRadius = 30 + Math.random() * 20;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.random() * Math.PI;
+      const waveOffset1 = Math.random() * Math.PI * 2;
+      const waveOffset2 = Math.random() * Math.PI * 2;
       
-      positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i3 + 2] = radius * Math.cos(phi);
+      particleData.push({
+        baseRadius,
+        theta,
+        phi,
+        waveOffset1,
+        waveOffset2,
+      });
+      
+      positions[i3] = baseRadius * Math.sin(phi) * Math.cos(theta);
+      positions[i3 + 1] = baseRadius * Math.sin(phi) * Math.sin(theta);
+      positions[i3 + 2] = baseRadius * Math.cos(phi);
 
       // Gradient colors
       const colorIndex = Math.floor((i / particleCount) * colorStops.length);
@@ -134,30 +153,23 @@ export function ParticleWaveLoader({ onComplete }: ParticleWaveLoaderProps) {
       
       const positions = geometry.attributes.position.array as Float32Array;
       
-      // Morphing wave animation
+      // Morphing wave animation using pre-computed particle data
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        const x = positions[i3];
-        const y = positions[i3 + 1];
-        const z = positions[i3 + 2];
-        
-        // Calculate base position
-        const theta = Math.atan2(y, x);
-        const phi = Math.acos(z / Math.sqrt(x * x + y * y + z * z));
-        const baseRadius = 30 + Math.random() * 20;
+        const data = particleData[i];
         
         // Apply multiple wave functions for organic movement
-        const wave1 = Math.sin(phi * 3 + time) * 5;
-        const wave2 = Math.cos(theta * 2 + time * 0.7) * 3;
+        const wave1 = Math.sin(data.phi * 3 + time + data.waveOffset1) * 5;
+        const wave2 = Math.cos(data.theta * 2 + time * 0.7 + data.waveOffset2) * 3;
         const wave3 = Math.sin(time * 0.5) * 2;
         const pulse = Math.sin(time * 2) * 2;
         
-        const radius = baseRadius + wave1 + wave2 + wave3 + pulse;
+        const radius = data.baseRadius + wave1 + wave2 + wave3 + pulse;
         
         // Update positions with smooth morphing
-        positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-        positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-        positions[i3 + 2] = radius * Math.cos(phi);
+        positions[i3] = radius * Math.sin(data.phi) * Math.cos(data.theta);
+        positions[i3 + 1] = radius * Math.sin(data.phi) * Math.sin(data.theta);
+        positions[i3 + 2] = radius * Math.cos(data.phi);
       }
       
       geometry.attributes.position.needsUpdate = true;
@@ -191,6 +203,11 @@ export function ParticleWaveLoader({ onComplete }: ParticleWaveLoaderProps) {
     return () => {
       if (sceneRef.current) {
         cancelAnimationFrame(sceneRef.current.animationId);
+        
+        // Properly dispose of geometry and material to prevent memory leaks
+        geometry.dispose();
+        material.dispose();
+        
         container.removeChild(sceneRef.current.renderer.domElement);
         sceneRef.current.renderer.dispose();
         sceneRef.current.scene.clear();
