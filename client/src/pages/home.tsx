@@ -204,10 +204,9 @@ export default function Home() {
                 Testimonials
               </a>
               
-              <ThemeToggle />
-              
               {!isLoading && !isAuthenticated && (
                 <>
+                  <ThemeToggle />
                   <Button variant="ghost" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
                     Login
                   </Button>
@@ -245,6 +244,13 @@ export default function Home() {
                           Dashboard
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Theme</span>
+                          <ThemeToggle />
+                        </div>
+                      </div>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => window.location.href = "/api/logout"} data-testid="menu-item-logout">
                         <LogOut className="w-4 h-4 mr-2" />
