@@ -382,7 +382,7 @@ export default function Home() {
             </div>
 
             {/* Right Column - Visual Element */}
-            <div className="relative">
+            <div className="relative flex items-center justify-center h-96">
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10"></div>
               <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10"></div>
             </div>
