@@ -1,10 +1,19 @@
 import { useState, useRef } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sparkles,
   Zap,
@@ -21,9 +30,16 @@ import {
   Github,
   Linkedin,
   Twitter,
+  User,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [trialPersonaName, setTrialPersonaName] = useState("");
   const [trialIntent, setTrialIntent] = useState("");
@@ -36,12 +52,32 @@ export default function Home() {
     trialSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      setLocation("/dashboard");
+    } else {
+      window.location.href = "/api/login";
+    }
+  };
+
   const handleSimulatePersona = () => {
     if (!trialPersonaName || !trialIntent) {
       setTrialResponse("Please fill in persona name and intent to see a preview.");
       return;
     }
 
+    // If authenticated, redirect to /dashboard/create with prefilled data
+    if (isAuthenticated) {
+      const params = new URLSearchParams({
+        name: trialPersonaName,
+        intent: trialIntent,
+        ...(trialExample && { example: trialExample }),
+      });
+      setLocation(`/dashboard/create?${params.toString()}`);
+      return;
+    }
+
+    // If not authenticated, show preview
     const samplePrompt = `You are ${trialPersonaName}. ${trialIntent}${
       trialExample ? `\n\nExample interaction:\n${trialExample}` : ""
     }`;
@@ -49,6 +85,19 @@ export default function Home() {
     setTrialResponse(
       `System Prompt Preview:\n\n"${samplePrompt}"\n\nThis persona is ready to be tested in the sandbox and deployed as an API!`
     );
+  };
+
+  const getUserInitials = () => {
+    if (!user) return "U";
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    if (firstName && lastName) {
+      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    }
+    if (user.email) {
+      return user.email.substring(0, 2).toUpperCase();
+    }
+    return "U";
   };
 
   const features = [
@@ -136,12 +185,55 @@ export default function Home() {
               >
                 Testimonials
               </a>
-              <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-dashboard">
-                Dashboard
-              </Link>
-              <Button asChild data-testid="button-get-started-nav">
-                <Link href="/dashboard">Get Started</Link>
-              </Button>
+              
+              {!isLoading && !isAuthenticated && (
+                <>
+                  <Button variant="ghost" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
+                    Login
+                  </Button>
+                  <Button onClick={handleGetStarted} data-testid="button-get-started-nav">
+                    Get Started
+                  </Button>
+                </>
+              )}
+              
+              {!isLoading && isAuthenticated && (
+                <>
+                  <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-dashboard">
+                    Dashboard
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-full" data-testid="button-user-menu">
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.email || "User"} />
+                          <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" data-testid="menu-user-dropdown">
+                      <DropdownMenuLabel>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "User"}</span>
+                          <span className="text-xs text-muted-foreground">{user?.email}</span>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard" data-testid="menu-item-dashboard">
+                          <User className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => window.location.href = "/api/logout"} data-testid="menu-item-logout">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -182,12 +274,50 @@ export default function Home() {
                 >
                   Testimonials
                 </a>
-                <Link href="/dashboard" className="text-sm text-muted-foreground" data-testid="link-mobile-dashboard">
-                  Dashboard
-                </Link>
-                <Button asChild size="sm" className="w-full" data-testid="button-mobile-get-started">
-                  <Link href="/dashboard">Get Started</Link>
-                </Button>
+                
+                {!isLoading && !isAuthenticated && (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-start" 
+                      onClick={() => window.location.href = "/api/login"} 
+                      data-testid="button-mobile-login"
+                    >
+                      Login
+                    </Button>
+                    <Button size="sm" className="w-full" onClick={handleGetStarted} data-testid="button-mobile-get-started">
+                      Get Started
+                    </Button>
+                  </>
+                )}
+                
+                {!isLoading && isAuthenticated && (
+                  <>
+                    <Link href="/dashboard" className="text-sm text-muted-foreground" data-testid="link-mobile-dashboard">
+                      Dashboard
+                    </Link>
+                    <div className="pt-2 border-t border-border">
+                      <div className="flex items-center gap-2 mb-2 px-2">
+                        <Avatar className="w-6 h-6">
+                          <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.email || "User"} />
+                          <AvatarFallback className="text-xs">{getUserInitials()}</AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium">{user?.email}</span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start text-destructive hover:text-destructive" 
+                        onClick={() => window.location.href = "/api/logout"} 
+                        data-testid="button-mobile-logout"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -214,11 +344,9 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild data-testid="button-start-trial">
-                  <Link href="/dashboard">
-                    Start Free Trial
-                    <ChevronRight className="w-4 h-4 ml-2" />
-                  </Link>
+                <Button size="lg" onClick={handleGetStarted} data-testid="button-start-trial">
+                  Start Free Trial
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
                 <Button size="lg" variant="outline" onClick={scrollToTrial} data-testid="button-view-demo">
                   View Demo
@@ -445,10 +573,10 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 {trialResponse ? (
-                  <div className="p-4 rounded-lg bg-muted border border-border">
-                    <pre className="text-sm whitespace-pre-wrap font-mono" data-testid="text-trial-response">
+                  <div className="p-4 rounded-lg bg-muted border border-border prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} data-testid="text-trial-response">
                       {trialResponse}
-                    </pre>
+                    </ReactMarkdown>
                   </div>
                 ) : (
                   <div className="p-8 text-center text-muted-foreground">
@@ -461,12 +589,12 @@ export default function Home() {
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-muted-foreground mb-4">Ready to build for real?</p>
-            <Button size="lg" asChild data-testid="button-create-account">
-              <Link href="/dashboard">
-                Create Free Account
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Link>
+            <p className="text-muted-foreground mb-4">
+              {isAuthenticated ? "Start creating your personas!" : "Ready to build for real?"}
+            </p>
+            <Button size="lg" onClick={handleGetStarted} data-testid="button-create-account">
+              {isAuthenticated ? "Go to Dashboard" : "Create Free Account"}
+              <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </div>

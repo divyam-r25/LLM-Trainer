@@ -53,6 +53,29 @@ export default function PersonaForm() {
   const [examples, setExamples] = useState<Array<{ input: string; output: string }>>([]);
   const [currentExample, setCurrentExample] = useState({ input: "", output: "" });
 
+  // Handle query params from trial section (homepage)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const nameParam = urlParams.get("name");
+    const intentParam = urlParams.get("intent");
+    const exampleParam = urlParams.get("example");
+
+    if (nameParam || intentParam) {
+      form.setValue("name", nameParam || "");
+      form.setValue("intent", intentParam || "");
+      
+      if (exampleParam) {
+        const exampleLines = exampleParam.split("\n");
+        if (exampleLines.length >= 2) {
+          setCurrentExample({
+            input: exampleLines[0].replace(/^User:\s*/i, ""),
+            output: exampleLines[1].replace(/^(Bot|Assistant):\s*/i, ""),
+          });
+        }
+      }
+    }
+  }, [form]);
+
   useEffect(() => {
     if (persona) {
       form.reset({
