@@ -38,7 +38,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
-          <img src={logoImage} alt="ForgeAI" className="w-8 h-8 rounded-md" />
+          <img src={logoImage} alt="ForgeAI" className="w-8 h-8 object-contain" />
           <span className="text-lg font-semibold">ForgeAI</span>
         </div>
       </SidebarHeader>

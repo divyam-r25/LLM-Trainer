@@ -175,7 +175,7 @@ export default function Home() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 hover-elevate" data-testid="link-home-logo">
-              <img src={logoImage} alt="ForgeAI" className="w-8 h-8 rounded-md" />
+              <img src={logoImage} alt="ForgeAI" className="w-8 h-8 object-contain" />
               <span className="text-lg font-semibold">ForgeAI</span>
             </Link>
 
@@ -388,7 +388,7 @@ export default function Home() {
                 <img 
                   src={logoImage} 
                   alt="ForgeAI Logo" 
-                  className="w-64 h-64 rounded-3xl shadow-2xl"
+                  className="w-64 h-64 object-contain"
                 />
               </div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10"></div>
@@ -612,9 +612,7 @@ export default function Home() {
             {/* Brand */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary-foreground" />
-                </div>
+                <img src={logoImage} alt="ForgeAI" className="w-8 h-8 object-contain" />
                 <span className="text-lg font-semibold">ForgeAI</span>
               </div>
               <p className="text-sm text-muted-foreground">Shape how your AI thinks.</p>
