@@ -174,9 +174,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat error:", error);
-      res.status(500).json({ error: "Failed to process chat message" });
+      
+      if (error?.status === 429) {
+        return res.status(429).json({ 
+          error: "OpenAI API quota exceeded. Please check your OpenAI account billing and add credits." 
+        });
+      }
+      
+      if (error?.code === 'insufficient_quota') {
+        return res.status(429).json({ 
+          error: "OpenAI API quota exceeded. Please add credits to your OpenAI account." 
+        });
+      }
+
+      if (error?.status === 401) {
+        return res.status(500).json({ 
+          error: "OpenAI API key is invalid. Please check your OPENAI_API_KEY environment variable." 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: error?.message || "Failed to process chat message" 
+      });
     }
   });
 

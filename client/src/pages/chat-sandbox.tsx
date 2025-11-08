@@ -45,10 +45,21 @@ export default function ChatSandbox() {
       ]);
       setInput("");
     },
-    onError: () => {
+    onError: async (error: any) => {
+      let errorMessage = "Failed to send message";
+      
+      if (error?.response) {
+        try {
+          const errorData = await error.response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = error.response.statusText || errorMessage;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to send message",
+        description: errorMessage,
         variant: "destructive",
       });
     },
