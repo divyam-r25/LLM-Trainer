@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation, useParams } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AILoadingSpinner } from "@/components/ai-loading-spinner";
 
 export default function PersonaForm() {
   const { id } = useParams<{ id?: string }>();
@@ -148,8 +149,21 @@ export default function PersonaForm() {
     );
   }
 
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {isPending && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card p-8 rounded-lg shadow-lg border border-border">
+            <AILoadingSpinner 
+              size="lg" 
+              message={isEdit ? "Updating your persona..." : "Creating your AI persona..."}
+            />
+          </div>
+        </div>
+      )}
+      
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-primary-foreground" />
@@ -322,7 +336,7 @@ export default function PersonaForm() {
             </Button>
             <Button
               type="submit"
-              disabled={createMutation.isPending || updateMutation.isPending}
+              disabled={isPending}
               data-testid="button-save"
             >
               <Save className="w-4 h-4 mr-2" />
