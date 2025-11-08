@@ -96,13 +96,13 @@ export default function PersonaForm() {
       const response = await apiRequest("POST", "/api/personas", data);
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (persona) => {
       queryClient.invalidateQueries({ queryKey: ["/api/personas"] });
       toast({
         title: "Success",
-        description: "Persona created successfully",
+        description: "Persona created successfully! Redirecting to chat sandbox...",
       });
-      setLocation("/");
+      setLocation(`/personas/${persona.id}/test`);
     },
     onError: () => {
       toast({
