@@ -1,0 +1,122 @@
+Add two new pages to the existing ForgeAI project.
+Do not delete, modify, or rename any existing files such as persona-form.tsx or chat-sandbox.tsx.
+Do not edit any logic inside /personas routes.
+
+Instead, create two new, independent pages in the pages directory:
+
+1️⃣ Page: /create
+
+File: src/pages/create-persona.tsx
+
+Goal:
+A standalone page for creating new AI personas, identical in layout and logic to /personas/new, but accessible directly at /create.
+
+Implementation details:
+
+Copy UI and logic from persona-form.tsx.
+
+Change route path to /create.
+
+Keep the same form structure (Name, Description, Intent, Few-Shot Examples).
+
+Connect Save Persona to POST /api/trainers.
+
+On save → redirect to /chat/:id (the new route below).
+
+Include success and error toasts.
+
+Page title: “Create New Persona”
+
+Responsive layout matching the dashboard styling.
+
+Use existing sidebar and top navigation wrapper.
+
+2️⃣ Page: /chat/:id
+
+File: src/pages/chat-page.tsx
+
+Goal:
+A standalone chat sandbox page, identical in logic to /personas/:id/test, but accessible directly via /chat/:id.
+
+Implementation details:
+
+Copy layout and message-handling logic from chat-sandbox.tsx.
+
+Use route parameter :id to fetch persona details.
+
+Fetch persona details via GET /api/trainers/{id}.
+
+Send messages to /api/chat/{id}.
+
+Render Markdown replies using react-markdown + remark-gfm.
+
+Save and restore chat history per persona.
+
+Include “Clear Chat” button.
+
+Make sure chat layout is fully responsive:
+
+Desktop: 2-column layout (persona info + chat)
+
+Mobile: 1-column stacked layout
+
+3️⃣ Routing Updates
+
+File: src/routes.tsx (or wherever routes are defined)
+
+Add:
+
+{
+  path: "/create",
+  element: <CreatePersonaPage />
+},
+{
+  path: "/chat/:id",
+  element: <ChatPage />
+}
+
+
+Do not remove or change existing /personas routes.
+
+4️⃣ Design and Responsiveness
+
+Use the same design system as the dashboard:
+
+Primary color: #2563EB
+
+Background: #F9FAFB
+
+Text: #0F172A
+
+Maintain consistent padding, spacing, and rounded corners.
+
+Verify mobile responsiveness (360px and 768px).
+
+Ensure both pages share the same top navigation and sidebar layout.
+
+5️⃣ Backend Integration
+
+Both pages should call the existing API routes:
+
+POST /api/trainers
+
+GET /api/trainers/{id}
+
+POST /api/chat/{id}
+
+GET /api/chat/history/{id}
+
+DELETE /api/chat/history/{id}
+
+No backend rewrite needed — only connect to these endpoints.
+
+6️⃣ Deliverables
+
+✅ New file: src/pages/create-persona.tsx
+✅ New file: src/pages/chat-page.tsx
+✅ New routes /create and /chat/:id working properly
+✅ Fully responsive on desktop and mobile
+✅ Existing dashboard and personas remain untouched
+
+Priority: 🔥 High
+Goal: Add two standalone pages for persona creation and chat testing at /create and /chat/:id, without affecting existing dashboard or persona routes.

@@ -23,21 +23,32 @@ ForgeAI adopts a minimalist, Linear/Vercel-inspired developer dashboard design w
 - Code blocks with syntax highlighting and copy-to-clipboard functionality.
 - Beautiful empty states and loading skeletons.
 - Premium particle sphere loading animations for AI operations.
+- **Dual Route System**: Both standalone routes (`/create`, `/chat/:id`) and integrated routes (`/personas/new`, `/personas/:id/test`) are available for flexibility.
 
 **Technical Implementations**:
 - **Frontend**: React with TypeScript and Wouter for routing.
+  - **Pages**: `create-persona.tsx`, `chat-page.tsx`, `persona-form.tsx`, `chat-sandbox.tsx`, `dashboard.tsx`, `api-keys.tsx`, `analytics.tsx`, `persona-deploy.tsx`, `home.tsx`
+  - **Routes**: Both standalone (`/create`, `/chat/:id`) and integrated (`/personas/*`) routes available
 - **Backend**: Express.js, providing RESTful API endpoints for all CRUD operations.
+  - **API Aliases**: `/api/trainers` routes as aliases for `/api/personas` endpoints for compatibility
 - **State Management**: TanStack Query is used for efficient data fetching and caching.
 - **Design System**: Tailwind CSS for styling, complemented by Shadcn UI components.
 - **Database**: PostgreSQL with Drizzle ORM for persistent data storage.
+  - **Multi-Tenant Security**: All personas and API keys filtered by authenticated userId
 - **Authentication**: Replit Auth blueprint integration for user authentication (OAuth with Google and Email/Password), including `users` and `sessions` tables.
 - **Security**: Bcrypt-hashed API keys, rate limiting (60 requests/minute), and `isAuthenticated` middleware for protected routes.
+  - **User Isolation**: Complete multi-tenant authorization for personas and API keys
+  - **Type Safety**: AuthenticatedRequest interface for all protected routes
 - **Adaptive Prompt Engineering**: A core system that automatically generates structured system prompts from user inputs.
 - **Chat Management**: Chat message persistence with session management, markdown rendering using `react-markdown` and `remark-gfm`.
 
 **Feature Specifications**:
 - **Persona Creation & Management**: Users can define, create, update, delete, publish, and unpublish AI personas.
+  - **Standalone Create Page** (`/create`): Independent persona creation page that redirects to `/chat/:id` on success
+  - **Original Create Page** (`/personas/new`): Original persona form that redirects to `/personas/:id/test`
 - **Live Chat Sandbox**: Real-time persona testing with conversation history and persistent sessions.
+  - **Standalone Chat Page** (`/chat/:id`): Independent chat sandbox for testing personas
+  - **Original Chat Page** (`/personas/:id/test`): Original chat sandbox integrated with persona management
 - **API Deployment**: One-click deployment of personas as public API endpoints with secure authentication.
 - **API Key Management**: Generation, regeneration, and management of secure API keys.
 - **Analytics Dashboard**: Tracking of token usage, requests, and performance metrics.
