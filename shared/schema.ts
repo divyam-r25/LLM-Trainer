@@ -114,6 +114,7 @@ export const insertPersonaSchema = createInsertSchema(personas, {
   })).min(0),
 }).omit({
   id: true,
+  userId: true,
   createdAt: true,
   updatedAt: true,
 });

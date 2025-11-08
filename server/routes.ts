@@ -2,12 +2,14 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertPersonaSchema, insertApiKeySchema, type ChatRequest, type ChatResponse } from "@shared/schema";
+import { insertPersonaSchema, insertApiKeySchema, type ChatRequest, type ChatResponse, personas } from "@shared/schema";
 import { generateSystemPrompt, getChatCompletion } from "./gemini";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import { rateLimiter } from "./rate-limiter";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth - Reference: blueprint:javascript_log_in_with_replit
@@ -29,18 +31,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Personas (Protected - require authentication)
-  app.get("/api/personas", isAuthenticated, async (req, res) => {
+  app.get("/api/personas", isAuthenticated, async (req: any, res) => {
     try {
-      const personas = await storage.getAllPersonas();
+      const userId = req.user.claims.sub;
+      const personas = await storage.getAllPersonas(userId);
       res.json(personas);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch personas" });
     }
   });
 
-  app.get("/api/personas/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/personas/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const persona = await storage.getPersona(req.params.id);
+      const userId = req.user.claims.sub;
+      const persona = await storage.getPersona(req.params.id, userId);
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -76,13 +80,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/personas/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const data = insertPersonaSchema.partial().parse(req.body);
       
       let systemPrompt = data.systemPrompt;
       if (data.name || data.intent || data.examples) {
-        const existingPersona = await storage.getPersona(req.params.id);
+        const existingPersona = await storage.getPersona(req.params.id, userId);
         if (!existingPersona) {
           return res.status(404).json({ error: "Persona not found" });
         }
@@ -97,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const persona = await storage.updatePersona(req.params.id, {
         ...data,
         systemPrompt,
-      });
+      }, userId);
 
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
@@ -112,9 +117,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/personas/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/personas/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const deleted = await storage.deletePersona(req.params.id);
+      const userId = req.user.claims.sub;
+      const deleted = await storage.deletePersona(req.params.id, userId);
       if (!deleted) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -124,9 +130,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id/publish", isAuthenticated, async (req, res) => {
+  app.patch("/api/personas/:id/publish", isAuthenticated, async (req: any, res) => {
     try {
-      const persona = await storage.publishPersona(req.params.id);
+      const userId = req.user.claims.sub;
+      const persona = await storage.publishPersona(req.params.id, userId);
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -136,9 +143,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/personas/:id/unpublish", isAuthenticated, async (req, res) => {
+  app.patch("/api/personas/:id/unpublish", isAuthenticated, async (req: any, res) => {
     try {
-      const persona = await storage.unpublishPersona(req.params.id);
+      const userId = req.user.claims.sub;
+      const persona = await storage.unpublishPersona(req.params.id, userId);
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -149,12 +157,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat (Sandbox)
-  app.get("/api/chat/:personaId/history", isAuthenticated, async (req, res) => {
+  app.get("/api/chat/:personaId/history", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const { personaId } = req.params;
       const { sessionId } = req.query;
 
-      const persona = await storage.getPersona(personaId);
+      const persona = await storage.getPersona(personaId, userId);
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -170,15 +179,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/chat", isAuthenticated, async (req, res) => {
+  app.post("/api/chat", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const { message, personaId, sessionId } = req.body as ChatRequest;
 
       if (!message || !personaId) {
         return res.status(400).json({ error: "Message and personaId are required" });
       }
 
-      const persona = await storage.getPersona(personaId);
+      const persona = await storage.getPersona(personaId, userId);
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -242,12 +252,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/chat/:personaId/clear", isAuthenticated, async (req, res) => {
+  app.delete("/api/chat/:personaId/clear", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const { personaId } = req.params;
       const { sessionId } = req.query;
 
-      const persona = await storage.getPersona(personaId);
+      const persona = await storage.getPersona(personaId, userId);
       if (!persona) {
         return res.status(404).json({ error: "Persona not found" });
       }
@@ -306,14 +317,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader("X-RateLimit-Remaining", rateLimit.remaining.toString());
       res.setHeader("X-RateLimit-Reset", new Date(rateLimit.resetTime).toISOString());
 
-      const persona = await storage.getPersona(personaId);
-      if (!persona) {
+      // For public API, we don't filter by userId but check if published
+      const [personaResult] = await db.select().from(personas).where(eq(personas.id, personaId));
+      if (!personaResult) {
         return res.status(404).json({ error: "Persona not found" });
       }
 
-      if (!persona.isPublished) {
+      if (!personaResult.isPublished) {
         return res.status(403).json({ error: "Persona is not published" });
       }
+      
+      const persona = personaResult;
 
       if (!message) {
         return res.status(400).json({ error: "Message is required" });

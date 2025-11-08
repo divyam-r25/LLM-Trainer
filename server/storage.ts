@@ -26,13 +26,13 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
 
   // Personas
-  getAllPersonas(): Promise<PersonaWithStats[]>;
-  getPersona(id: string): Promise<Persona | undefined>;
-  createPersona(persona: InsertPersona): Promise<Persona>;
-  updatePersona(id: string, persona: Partial<InsertPersona>): Promise<Persona | undefined>;
-  deletePersona(id: string): Promise<boolean>;
-  publishPersona(id: string): Promise<Persona | undefined>;
-  unpublishPersona(id: string): Promise<Persona | undefined>;
+  getAllPersonas(userId: string): Promise<PersonaWithStats[]>;
+  getPersona(id: string, userId: string): Promise<Persona | undefined>;
+  createPersona(persona: InsertPersona & { userId: string }): Promise<Persona>;
+  updatePersona(id: string, persona: Partial<InsertPersona>, userId: string): Promise<Persona | undefined>;
+  deletePersona(id: string, userId: string): Promise<boolean>;
+  publishPersona(id: string, userId: string): Promise<Persona | undefined>;
+  unpublishPersona(id: string, userId: string): Promise<Persona | undefined>;
 
   // API Keys
   getAllApiKeys(): Promise<ApiKey[]>;
@@ -81,8 +81,8 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getAllPersonas(): Promise<PersonaWithStats[]> {
-    const allPersonas = await db.select().from(personas);
+  async getAllPersonas(userId: string): Promise<PersonaWithStats[]> {
+    const allPersonas = await db.select().from(personas).where(eq(personas.userId, userId));
     
     const personasWithStats = await Promise.all(
       allPersonas.map(async (persona) => {
@@ -111,44 +111,46 @@ export class DatabaseStorage implements IStorage {
     return personasWithStats;
   }
 
-  async getPersona(id: string): Promise<Persona | undefined> {
-    const [persona] = await db.select().from(personas).where(eq(personas.id, id));
+  async getPersona(id: string, userId: string): Promise<Persona | undefined> {
+    const [persona] = await db.select().from(personas).where(
+      and(eq(personas.id, id), eq(personas.userId, userId))
+    );
     return persona;
   }
 
-  async createPersona(insertPersona: InsertPersona): Promise<Persona> {
+  async createPersona(insertPersona: InsertPersona & { userId: string }): Promise<Persona> {
     const [persona] = await db.insert(personas).values(insertPersona).returning();
     return persona;
   }
 
-  async updatePersona(id: string, updates: Partial<InsertPersona>): Promise<Persona | undefined> {
+  async updatePersona(id: string, updates: Partial<InsertPersona>, userId: string): Promise<Persona | undefined> {
     const [updated] = await db
       .update(personas)
       .set({ ...updates, updatedAt: new Date() })
-      .where(eq(personas.id, id))
+      .where(and(eq(personas.id, id), eq(personas.userId, userId)))
       .returning();
     return updated;
   }
 
-  async deletePersona(id: string): Promise<boolean> {
-    const result = await db.delete(personas).where(eq(personas.id, id));
+  async deletePersona(id: string, userId: string): Promise<boolean> {
+    const result = await db.delete(personas).where(and(eq(personas.id, id), eq(personas.userId, userId)));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
-  async publishPersona(id: string): Promise<Persona | undefined> {
+  async publishPersona(id: string, userId: string): Promise<Persona | undefined> {
     const [updated] = await db
       .update(personas)
       .set({ isPublished: 1, updatedAt: new Date() })
-      .where(eq(personas.id, id))
+      .where(and(eq(personas.id, id), eq(personas.userId, userId)))
       .returning();
     return updated;
   }
 
-  async unpublishPersona(id: string): Promise<Persona | undefined> {
+  async unpublishPersona(id: string, userId: string): Promise<Persona | undefined> {
     const [updated] = await db
       .update(personas)
       .set({ isPublished: 0, updatedAt: new Date() })
-      .where(eq(personas.id, id))
+      .where(and(eq(personas.id, id), eq(personas.userId, userId)))
       .returning();
     return updated;
   }
