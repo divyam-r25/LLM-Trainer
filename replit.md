@@ -118,11 +118,12 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 - **2025-11-08**: ✅ Added delete functionality to persona edit page
   - Delete button with confirmation dialog in edit mode
   - AlertDialog warns about permanent deletion and shows persona name
-  - Proper cache invalidation to update dashboard after deletion
+  - **Fixed**: Added cascade delete constraints to analytics table (personaId and apiKeyId)
+  - Proper cascade deletion of all related data (API keys, analytics, chat messages)
   - Success/error toast notifications with redirect to dashboard
   - Destructive styling (red button) positioned on left side of form
   - Safe deletion with explicit user confirmation required
-  - **Tested**: Visual confirmation shows successful deletion with toast notification
+  - **Tested**: E2E test confirms DELETE returns 204, persona removed from dashboard
 
 - **2025-11-08**: ✅ Implemented clean AI thinking loader
   - Replaced complex 3D particle system with simple, professional loading indicator
