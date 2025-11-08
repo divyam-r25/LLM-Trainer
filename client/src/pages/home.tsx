@@ -366,7 +366,7 @@ export default function Home() {
                 </Badge>
                 
                 <h1 className="text-5xl lg:text-7xl font-bold leading-tight" data-testid="text-hero-title">
-                  <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent text-[64px] text-center">Train.Test. Deploy</span>
+                  <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent text-center text-[60px]">Train.Test. Deploy</span>
                   <br />
                   <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-[64px] text-center">
                     custom AI personas
