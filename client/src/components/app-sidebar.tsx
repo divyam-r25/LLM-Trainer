@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import logoImage from "@assets/WhatsApp Image 2025-11-08 at 18.03.25_2ae07f67_1762608862100.jpg";
 
 const menuItems = [
   {
@@ -37,9 +38,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src={logoImage} alt="ForgeAI" className="w-8 h-8 rounded-md" />
           <span className="text-lg font-semibold">ForgeAI</span>
         </div>
       </SidebarHeader>
