@@ -17,13 +17,22 @@ ForgeAI adopts a minimalist, Linear/Vercel-inspired developer dashboard design w
 - Clean, scannable hierarchy with clear visual weight.
 - Developer-first user experience prioritizing speed and clarity.
 - **Typography**: Inter font for interface text and JetBrains Mono for code blocks.
+- **Color Palette** (Modern Blue-Based Theme):
+  - Primary (Dark Blue): #274C77 - Buttons, CTAs, sidebar background
+  - Secondary (Medium Blue): #6096BA - Hover states, links
+  - Accent (Light Blue): #A3CEF1 - Highlights, focus states
+  - Background (Light Grayish Blue): #E7ECEF - Main background
+  - Neutral (Grayish): #8B8C89 - Borders, muted text
+  - Text (Almost Black): #0F172A - Primary text, headings
+  - Card Background (White): #FFFFFF - Cards, panels
 - Consistent spacing utilizing Tailwind's spacing scale.
-- Sidebar navigation with icon and label menu items.
+- Sidebar navigation with icon and label menu items (dark blue background with white text).
 - Responsive grids for displaying persona libraries.
 - Code blocks with syntax highlighting and copy-to-clipboard functionality.
 - Beautiful empty states and loading skeletons.
 - Premium particle sphere loading animations for AI operations.
 - **Dual Route System**: Both standalone routes (`/create`, `/chat/:id`) and integrated routes (`/personas/new`, `/personas/:id/test`) are available for flexibility.
+- **Accessibility**: High contrast ratios (>7:1 for text, ~9:1 for buttons) ensuring WCAG compliance.
 
 **Technical Implementations**:
 - **Frontend**: React with TypeScript and Wouter for routing.

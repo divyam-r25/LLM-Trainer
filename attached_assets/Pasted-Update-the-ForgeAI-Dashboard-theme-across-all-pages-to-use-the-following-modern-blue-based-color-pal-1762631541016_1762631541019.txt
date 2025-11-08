@@ -1,0 +1,107 @@
+Update the ForgeAI Dashboard theme across all pages to use the following modern blue-based color palette, while keeping the existing layout, typography, and structure fully intact.
+
+🎯 Color Palette to Apply
+Role	Color	Hex
+Primary (Buttons, CTAs)	Dark Blue	#274C77
+Secondary (Hover / Links)	Medium Blue	#6096BA
+Highlight / Accent	Light Blue	#A3CEF1
+Background	Light Grayish Blue	#E7ECEF
+Neutral / Border / Muted Text	Grayish Neutral	#8B8C89
+Primary Text	Almost Black	#0F172A
+Card Background	White	#FFFFFF
+🛠️ Implementation Instructions
+
+Do not alter layout or structure — keep all components, spacing, and typography exactly as they are.
+
+Update Tailwind or CSS variables to use the new color palette:
+
+Replace existing --primary, --secondary, --accent, --background, and --neutral values.
+
+Update Tailwind theme config if applicable:
+
+theme: {
+  extend: {
+    colors: {
+      primary: '#274C77',
+      secondary: '#6096BA',
+      accent: '#A3CEF1',
+      background: '#E7ECEF',
+      neutral: '#8B8C89',
+      text: '#0F172A',
+    }
+  }
+}
+
+
+Apply theme updates globally:
+
+Update any references in globals.css, tailwind.config.js, or theme.ts.
+
+Ensure background color for dashboard pages (and sidebar) is #E7ECEF.
+
+Card surfaces remain white #FFFFFF with subtle shadows.
+
+Text color updated to #0F172A for headings and #8B8C89 for muted labels.
+
+Buttons & Links
+
+Primary buttons → background #274C77, hover #6096BA.
+
+Secondary or outline buttons → border #6096BA, hover background #A3CEF1.
+
+Links → color #6096BA, hover #274C77.
+
+Charts / Analytics
+
+Update chart accent lines and labels to fit palette (use #6096BA and #A3CEF1).
+
+Maintain strong contrast for readability.
+
+Sidebar & Navbar
+
+Sidebar background → #274C77
+
+Active item highlight → #6096BA
+
+Hover state → lighter #A3CEF1
+
+Icons → white or #E7ECEF
+
+Do not change:
+
+Font family (keep Inter + JetBrains Mono)
+
+Padding, spacing, or layout grid
+
+Component logic or routes
+
+Ensure full responsiveness remains intact
+
+Test on desktop (1280px+), tablet (768px), and mobile (360px)
+
+No visual glitches from color contrast
+
+✅ Expected Result
+
+After this update:
+
+Dashboard background uses #E7ECEF
+
+Sidebar and buttons adopt deep blue tones (#274C77 / #6096BA)
+
+Cards and tables remain white with subtle blue-gray accents
+
+Text is dark and readable (#0F172A for headers, #8B8C89 for muted)
+
+Entire theme feels modern, clean, professional, and AI-tech aligned
+
+⚠️ Notes
+
+Do not modify or rename existing files.
+
+Only update color-related theme values or utility classes.
+
+Keep all animations, shadows, and layout logic unchanged.
+
+Priority: 🔥 High
+Goal: Apply the new ForgeAI blue-based color palette globally to the dashboard and all its components while maintaining full responsiveness and functionality.
