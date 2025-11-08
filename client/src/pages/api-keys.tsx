@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
+import { Key, Plus, Copy, Check, Trash2, RefreshCw, Power } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { ApiKey, Persona, InsertApiKey } from "@shared/schema";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +22,8 @@ export default function ApiKeys() {
   const [keyName, setKeyName] = useState("");
   const [selectedPersonaId, setSelectedPersonaId] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
+  const [showKeyDialog, setShowKeyDialog] = useState(false);
 
   const { data: apiKeys, isLoading: keysLoading } = useQuery<ApiKey[]>({
     queryKey: ["/api/api-keys"],
@@ -35,11 +38,13 @@ export default function ApiKeys() {
       const response = await apiRequest("POST", "/api/api-keys", data);
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/api-keys"] });
       setIsDialogOpen(false);
       setKeyName("");
       setSelectedPersonaId("");
+      setNewlyCreatedKey(data.plainTextKey);
+      setShowKeyDialog(true);
       toast({
         title: "Success",
         description: "API key created successfully",
@@ -49,6 +54,50 @@ export default function ApiKeys() {
       toast({
         title: "Error",
         description: "Failed to create API key",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const regenerateKeyMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("PATCH", `/api/api-keys/${id}/regenerate`, undefined);
+      return await response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/api-keys"] });
+      setNewlyCreatedKey(data.plainTextKey);
+      setShowKeyDialog(true);
+      toast({
+        title: "Success",
+        description: "API key regenerated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to regenerate API key",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const toggleKeyMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const response = await apiRequest("PATCH", `/api/api-keys/${id}/toggle`, { isActive });
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/api-keys"] });
+      toast({
+        title: "Success",
+        description: "API key status updated",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update API key status",
         variant: "destructive",
       });
     },
@@ -84,10 +133,6 @@ export default function ApiKeys() {
       title: "Copied",
       description: "API key copied to clipboard",
     });
-  };
-
-  const maskKey = (key: string) => {
-    return `${key.slice(0, 8)}${"•".repeat(24)}${key.slice(-8)}`;
   };
 
   return (
@@ -162,6 +207,45 @@ export default function ApiKeys() {
         </Dialog>
       </div>
 
+      <Dialog open={showKeyDialog} onOpenChange={setShowKeyDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>API Key Created</DialogTitle>
+            <DialogDescription>
+              Copy this key now. You won't be able to see it again.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Alert>
+              <Key className="w-4 h-4" />
+              <AlertDescription>
+                <div className="mt-2">
+                  <code className="block text-xs font-mono bg-muted p-3 rounded break-all">
+                    {newlyCreatedKey}
+                  </code>
+                </div>
+              </AlertDescription>
+            </Alert>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (newlyCreatedKey) {
+                  copyKey(newlyCreatedKey);
+                }
+              }}
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Copy Key
+            </Button>
+            <Button onClick={() => setShowKeyDialog(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Card>
         <CardHeader>
           <CardTitle>Your API Keys</CardTitle>
@@ -185,7 +269,7 @@ export default function ApiKeys() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Persona</TableHead>
-                  <TableHead>Key</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Last Used</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -199,9 +283,9 @@ export default function ApiKeys() {
                       <TableCell className="font-medium">{apiKey.name}</TableCell>
                       <TableCell>{persona?.name || "Unknown"}</TableCell>
                       <TableCell>
-                        <code className="text-xs font-mono bg-muted px-2 py-1 rounded">
-                          {maskKey(apiKey.key)}
-                        </code>
+                        <Badge variant={apiKey.isActive ? "default" : "secondary"}>
+                          {apiKey.isActive ? "Active" : "Disabled"}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {new Date(apiKey.createdAt).toLocaleDateString()}
@@ -212,23 +296,30 @@ export default function ApiKeys() {
                           : "Never"}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyKey(apiKey.key)}
-                            data-testid={`button-copy-${apiKey.id}`}
+                            onClick={() => regenerateKeyMutation.mutate(apiKey.id)}
+                            title="Regenerate key"
+                            data-testid={`button-regenerate-${apiKey.id}`}
                           >
-                            {copiedKey === apiKey.key ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
+                            <RefreshCw className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleKeyMutation.mutate({ id: apiKey.id, isActive: !apiKey.isActive })}
+                            title={apiKey.isActive ? "Disable key" : "Enable key"}
+                            data-testid={`button-toggle-${apiKey.id}`}
+                          >
+                            <Power className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => deleteKeyMutation.mutate(apiKey.id)}
+                            title="Delete key"
                             data-testid={`button-delete-${apiKey.id}`}
                           >
                             <Trash2 className="w-4 h-4" />

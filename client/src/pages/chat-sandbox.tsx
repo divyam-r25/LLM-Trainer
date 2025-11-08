@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Sparkles, User, Bot } from "lucide-react";
+import { Send, Sparkles, User, Bot, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Persona, ChatRequest, ChatResponse } from "@shared/schema";
+import type { Persona, ChatRequest, ChatResponse, ChatMessage } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,14 +24,58 @@ export default function ChatSandbox() {
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [sessionId, setSessionId] = useState<string>("");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: persona, isLoading } = useQuery<Persona>({
     queryKey: ["/api/personas", id],
   });
 
+  useEffect(() => {
+    if (!id) return;
+    
+    const storageKey = `chat-session-${id}`;
+    let storedSessionId = localStorage.getItem(storageKey);
+    
+    if (!storedSessionId) {
+      storedSessionId = `session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      localStorage.setItem(storageKey, storedSessionId);
+    }
+    
+    setSessionId(storedSessionId);
+  }, [id]);
+
+  useEffect(() => {
+    if (!id || !sessionId) return;
+
+    const loadChatHistory = async () => {
+      try {
+        const response = await fetch(`/api/chat/${id}/history?sessionId=${sessionId}`);
+        if (response.ok) {
+          const history: ChatMessage[] = await response.json();
+          const formattedMessages = history.map(msg => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content,
+          }));
+          setMessages(formattedMessages);
+        }
+      } catch (error) {
+        console.error("Failed to load chat history:", error);
+      }
+    };
+
+    loadChatHistory();
+  }, [id, sessionId]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   const sendMutation = useMutation({
     mutationFn: async (message: string) => {
-      const request: ChatRequest = { message, personaId: id! };
+      const request: ChatRequest = { message, personaId: id!, sessionId };
       const response = await apiRequest("POST", "/api/chat", request);
       return await response.json() as ChatResponse;
     },
@@ -65,6 +111,27 @@ export default function ChatSandbox() {
       toast({
         title: "Error",
         description: errorMessage,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const clearChatMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", `/api/chat/${id}/clear?sessionId=${sessionId}`);
+      return response;
+    },
+    onSuccess: () => {
+      setMessages([]);
+      toast({
+        title: "Chat Cleared",
+        description: "Conversation history has been cleared.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to clear chat history.",
         variant: "destructive",
       });
     },
@@ -117,8 +184,18 @@ export default function ChatSandbox() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader className="border-b border-border">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-border">
             <CardTitle className="text-lg">Chat Sandbox</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => clearChatMutation.mutate()}
+              disabled={messages.length === 0 || clearChatMutation.isPending}
+              data-testid="button-clear-chat"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Clear Chat
+            </Button>
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[500px] p-6">
@@ -154,7 +231,15 @@ export default function ChatSandbox() {
                             : "bg-muted"
                         }`}
                       >
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        {message.role === "user" ? (
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        ) : (
+                          <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {message.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
                         {message.tokensUsed && (
                           <p className="text-xs mt-2 opacity-70">
                             {message.tokensUsed} tokens
@@ -182,6 +267,7 @@ export default function ChatSandbox() {
                       </div>
                     </div>
                   )}
+                  <div ref={scrollRef} />
                 </div>
               )}
             </ScrollArea>

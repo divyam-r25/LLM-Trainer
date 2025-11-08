@@ -1,0 +1,85 @@
+1. Chat Message Persistence
+
+Problem:
+Currently, chat messages are not being saved. When the user reloads the page or sends a new message, the previous conversation disappears.
+
+Expected Fix:
+
+Implement chat persistence so that conversations remain visible even after reload.
+
+Use either Replit DB or Supabase to store chat sessions.
+
+Each chat message should be linked to a unique session_id and trainer_id.
+
+On page load, the chat should fetch past messages for that session and display them in chronological order.
+
+When a new message is sent, it should append to the same session instead of overwriting previous messages.
+
+Optionally, add a “Clear Chat” button to start a fresh conversation session.
+
+Backend Notes (FastAPI):
+
+Add a /api/chat/history/{trainer_id} endpoint that returns saved chat messages.
+
+Save each message (role, content, timestamp, session_id) after sending or receiving.
+
+Return stored messages to the frontend on reload.
+
+Frontend Notes (React):
+
+On ChatSandbox mount, call /api/chat/history/{trainer_id} to populate the chat box.
+
+Maintain session persistence in localStorage (session_id) so user reopens the same chat session.
+
+Append new messages dynamically as responses arrive.
+
+2. Markdown Rendering in Chat
+
+Problem:
+The assistant responses show raw Markdown syntax (**text**, `code`) instead of formatted text.
+
+Expected Fix:
+
+Properly render Markdown in the chat UI.
+
+Install and configure:
+
+npm install react-markdown remark-gfm
+
+
+Use <ReactMarkdown> for rendering assistant messages and support formatting:
+
+Bold / Italic text
+
+Inline code and code blocks
+
+Lists, tables, and links
+
+Example Implementation:
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+function ChatMessage({ role, content }) {
+  return (
+    <div className={role === "user" ? "user-msg" : "bot-msg"}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    </div>
+  );
+}
+
+
+Expected Behavior:
+
+Assistant replies render formatted Markdown (no raw ** or backticks).
+
+Lists, code blocks, and emphasis appear styled and readable.
+
+Success Criteria
+
+✅ Chat history loads automatically when reopening the same persona session.
+✅ New messages append to existing chat logs and persist after reload.
+✅ Markdown (bold, lists, code) renders correctly in assistant messages.
+✅ Clear Chat button resets the conversation cleanly.
+
+Tech Stack Context:

@@ -4,6 +4,9 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertPersonaSchema, insertApiKeySchema, type ChatRequest, type ChatResponse } from "@shared/schema";
 import { generateSystemPrompt, getChatCompletion } from "./gemini";
+import bcrypt from "bcrypt";
+import { randomUUID } from "crypto";
+import { rateLimiter } from "./rate-limiter";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Personas
@@ -125,9 +128,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat (Sandbox)
+  app.get("/api/chat/:personaId/history", async (req, res) => {
+    try {
+      const { personaId } = req.params;
+      const { sessionId } = req.query;
+
+      const persona = await storage.getPersona(personaId);
+      if (!persona) {
+        return res.status(404).json({ error: "Persona not found" });
+      }
+
+      const messages = await storage.getChatMessages(
+        personaId,
+        sessionId as string | undefined
+      );
+      res.json(messages);
+    } catch (error) {
+      console.error("Failed to fetch chat history:", error);
+      res.status(500).json({ error: "Failed to fetch chat history" });
+    }
+  });
+
   app.post("/api/chat", async (req, res) => {
     try {
-      const { message, personaId } = req.body as ChatRequest;
+      const { message, personaId, sessionId } = req.body as ChatRequest;
 
       if (!message || !personaId) {
         return res.status(400).json({ error: "Message and personaId are required" });
@@ -138,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Persona not found" });
       }
 
-      const chatHistory = await storage.getChatMessages(personaId);
+      const chatHistory = await storage.getChatMessages(personaId, sessionId);
       const conversationHistory = chatHistory.map((msg) => ({
         role: msg.role as "user" | "assistant",
         content: msg.content,
@@ -152,12 +176,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await storage.createChatMessage({
         personaId,
+        sessionId: sessionId || "default",
         role: "user",
         content: message,
       });
 
       await storage.createChatMessage({
         personaId,
+        sessionId: sessionId || "default",
         role: "assistant",
         content: completion.message,
       });
@@ -195,6 +221,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/chat/:personaId/clear", async (req, res) => {
+    try {
+      const { personaId } = req.params;
+      const { sessionId } = req.query;
+
+      const persona = await storage.getPersona(personaId);
+      if (!persona) {
+        return res.status(404).json({ error: "Persona not found" });
+      }
+
+      await storage.clearChatMessages(personaId, sessionId as string | undefined);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Failed to clear chat:", error);
+      res.status(500).json({ error: "Failed to clear chat" });
+    }
+  });
+
   // Public API endpoint for deployed personas
   app.post("/api/v1/chat/:personaId", async (req, res) => {
     try {
@@ -206,12 +250,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Missing or invalid authorization header" });
       }
 
-      const apiKey = authHeader.substring(7);
-      const keyRecord = await storage.getApiKeyByKey(apiKey);
-
-      if (!keyRecord || keyRecord.personaId !== personaId) {
-        return res.status(403).json({ error: "Invalid API key for this persona" });
+      const plainTextKey = authHeader.substring(7);
+      const keyHash = await bcrypt.hash(plainTextKey, 10);
+      
+      const allKeys = await storage.getAllApiKeys();
+      let keyRecord = null;
+      
+      for (const key of allKeys) {
+        const matches = await bcrypt.compare(plainTextKey, key.keyHash);
+        if (matches && key.personaId === personaId) {
+          keyRecord = key;
+          break;
+        }
       }
+
+      if (!keyRecord) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      if (!keyRecord.isActive) {
+        return res.status(403).json({ error: "API key has been disabled" });
+      }
+
+      const rateLimit = rateLimiter.checkLimit(keyRecord.id);
+      if (!rateLimit.allowed) {
+        const resetDate = new Date(rateLimit.resetTime);
+        return res.status(429).json({
+          error: "Rate limit exceeded",
+          resetAt: resetDate.toISOString(),
+        });
+      }
+
+      res.setHeader("X-RateLimit-Limit", "60");
+      res.setHeader("X-RateLimit-Remaining", rateLimit.remaining.toString());
+      res.setHeader("X-RateLimit-Reset", new Date(rateLimit.resetTime).toISOString());
 
       const persona = await storage.getPersona(personaId);
       if (!persona) {
@@ -265,13 +337,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/api-keys", async (req, res) => {
     try {
       const data = insertApiKeySchema.parse(req.body);
-      const apiKey = await storage.createApiKey(data);
-      res.status(201).json(apiKey);
+      
+      const plainTextKey = `fai_${randomUUID().replace(/-/g, "")}`;
+      const keyHash = await bcrypt.hash(plainTextKey, 10);
+      
+      const result = await storage.createApiKey(data, plainTextKey, keyHash);
+      
+      res.status(201).json({
+        ...result.apiKey,
+        plainTextKey: result.plainTextKey,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: error.errors });
       }
       res.status(500).json({ error: "Failed to create API key" });
+    }
+  });
+
+  app.patch("/api/api-keys/:id/regenerate", async (req, res) => {
+    try {
+      const plainTextKey = `fai_${randomUUID().replace(/-/g, "")}`;
+      const keyHash = await bcrypt.hash(plainTextKey, 10);
+      
+      const result = await storage.regenerateApiKey(req.params.id, plainTextKey, keyHash);
+      
+      if (!result.apiKey) {
+        return res.status(404).json({ error: "API key not found" });
+      }
+      
+      res.json({
+        ...result.apiKey,
+        plainTextKey: result.plainTextKey,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to regenerate API key" });
+    }
+  });
+
+  app.patch("/api/api-keys/:id/toggle", async (req, res) => {
+    try {
+      const { isActive } = req.body;
+      
+      if (typeof isActive !== "boolean") {
+        return res.status(400).json({ error: "isActive must be a boolean" });
+      }
+      
+      const apiKey = await storage.toggleApiKeyStatus(req.params.id, isActive);
+      
+      if (!apiKey) {
+        return res.status(404).json({ error: "API key not found" });
+      }
+      
+      res.json(apiKey);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to toggle API key status" });
     }
   });
 
