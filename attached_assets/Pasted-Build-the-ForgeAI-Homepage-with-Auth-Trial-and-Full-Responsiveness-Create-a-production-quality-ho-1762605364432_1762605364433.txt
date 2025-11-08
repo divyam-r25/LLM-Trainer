@@ -1,0 +1,219 @@
+Build the ForgeAI Homepage with Auth, Trial, and Full Responsiveness
+
+Create a production-quality homepage in React + Tailwind that matches the existing dashboard style. Include a working Login/Sign up modal with Google OAuth and Email + Password flows. The page must be fully responsive for mobile, tablet, and desktop.
+
+Tech and palette
+
+React + Vite + Tailwind
+
+Fonts: Inter for UI, JetBrains Mono for code
+
+Color palette
+
+Primary Blue: #2563EB
+
+Deep Blue: #1E40AF
+
+Background: #F9FAFB
+
+Text Primary: #0F172A
+
+Card Surface: #FFFFFF
+
+Text Secondary: #475569
+
+Auth provider: Supabase Auth (recommended) with Google provider enabled
+
+Env vars: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+
+Alternative acceptable: Firebase Auth with Google provider. If using Firebase, expose VITE_FIREBASE_* config and implement equivalent flows.
+
+Page structure
+
+Navbar
+
+Left: ForgeAI logo + brand
+
+Right: Links: Features, Testimonials, Docs
+
+Buttons: Login, Get Started
+
+Mobile: collapsible menu
+
+Hero
+
+Left block
+
+Headline: “Train. Test. Deploy custom AI personas in minutes.”
+
+Subtext: “Build specialized assistants without fine-tuning.”
+
+Buttons
+
+Start Free Trial → if authenticated go to /dashboard/create, else open auth modal
+
+View Demo → smooth scroll to Trial
+
+Right block
+
+Dashboard mockup or animated persona cards
+
+Why ForgeAI
+
+Three feature cards
+
+No fine-tuning needed
+
+Real-time testing
+
+API-ready deployment
+
+Feature Comparison: ForgeAI vs Manual Prompting
+
+Two-column table or cards with these rows: Setup time, Consistency, Versioning, API integration, Reusability, Analytics
+
+Highlight the ForgeAI column
+
+Trial section (interactive preview)
+
+Left: mini Create Persona form
+
+Persona name
+
+Intent
+
+One example pair (user → assistant)
+
+Simulate button
+
+Behavior
+
+If not logged in → open auth modal
+
+If logged in → route to /dashboard/create and prefill fields
+
+Right: preview box that shows a sample generated system prompt or mock response
+
+Testimonials
+
+Three to four cards with name, role, quote
+
+Footer
+
+Logo + tagline: “Shape how your AI thinks.”
+
+Links: Dashboard, Docs, API, GitHub, Contact
+
+Social icons
+
+Copyright line
+
+Auth requirements
+
+Use Supabase Auth or Firebase Auth. Supabase preferred for speed.
+
+Common requirements
+
+Modal-based Login and Sign up with tabs
+
+Providers
+
+Google OAuth button
+
+Email + Password form
+
+Forgot Password
+
+Email input to send reset link
+
+Confirmation state in UI
+
+Validation and UX
+
+Disable submit while loading
+
+Inline errors from provider
+
+Success states and toasts
+
+Routing rules
+
+If user clicks Start Free Trial or presses Simulate while not authenticated
+
+open auth modal
+
+After successful auth
+
+if the user came from Trial → push to /dashboard/create with prefilled query params
+
+else push to /dashboard
+
+State management
+
+Store auth session in provider SDK
+
+On app mount, restore session and update UI buttons
+
+Show avatar menu when logged in with menu items: Dashboard, API Keys, Sign out
+
+Backend hook
+
+For protected API calls, send the Supabase JWT in Authorization: Bearer <token>
+
+Provide a helper to get the token from the client and attach it to requests
+
+Responsiveness
+
+Mobile first. Test breakpoints at 360, 768, 1024, 1280.
+
+Navbar collapses to a hamburger.
+
+Hero stacks vertically on mobile.
+
+Cards become a single column on small screens, two columns on tablets, three on desktop.
+
+Buttons and inputs have comfortable touch targets.
+
+Libraries to install
+npm i @supabase/supabase-js
+npm i react-markdown remark-gfm
+npm i clsx
+
+
+If you choose Firebase instead of Supabase:
+
+npm i firebase
+
+Components to deliver
+
+HomePage.jsx composing: Navbar, Hero, Why, Comparison, Trial, Testimonials, Footer
+
+AuthModal.jsx with tabs: Login, Sign up, Forgot password
+
+Buttons: Continue with Google, Email login, Email sign up
+
+TrialForm.jsx with three inputs and simulate button
+
+Emits prefill data and triggers auth modal when unauthenticated
+
+MarkdownPreview.jsx using react-markdown + remark-gfm
+
+useAuth.ts(x) or authClient.ts for Supabase client and session helpers
+
+routes update to wire Get Started and post-auth redirects
+
+Acceptance criteria
+
+Login, Sign up, Google OAuth, and Forgot Password all work end to end
+
+Auth modal opens from Navbar buttons and Trial section when needed
+
+After login from modal, user is redirected correctly
+
+Trial form prefills the Create Persona page when authenticated
+
+Page renders correctly on mobile, tablet, and desktop
+
+Markdown preview renders bold, lists, code blocks in the Trial preview
+
+Color palette and spacing match the dashboard look and feel
