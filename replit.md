@@ -115,6 +115,15 @@ ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design w
 
 ## Recent Changes
 
+- **2025-11-08**: ✅ Added delete functionality to persona edit page
+  - Delete button with confirmation dialog in edit mode
+  - AlertDialog warns about permanent deletion and shows persona name
+  - Proper cache invalidation to update dashboard after deletion
+  - Success/error toast notifications with redirect to dashboard
+  - Destructive styling (red button) positioned on left side of form
+  - Safe deletion with explicit user confirmation required
+  - **Tested**: Visual confirmation shows successful deletion with toast notification
+
 - **2025-11-08**: ✅ Implemented clean AI thinking loader
   - Replaced complex 3D particle system with simple, professional loading indicator
   - **Design**: Three pulsing dots with "Thinking..." text - matches modern AI chat UX patterns (ChatGPT, Claude)
