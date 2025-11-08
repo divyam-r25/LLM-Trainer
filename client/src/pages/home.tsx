@@ -359,7 +359,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column */}
             <div className="space-y-8">
-              <div className="space-y-6">
+              <div className="space-y-6 ml-[20px] mr-[20px] pl-[20px] pr-[20px]">
                 <Badge variant="secondary" className="w-fit border border-primary/20 bg-primary/5 hover-elevate" data-testid="badge-hero">
                   <Sparkles className="w-3 h-3 mr-1 text-primary" />
                   <span className="font-medium">No Fine-Tuning Required</span>
