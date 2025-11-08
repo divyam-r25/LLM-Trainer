@@ -34,6 +34,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/theme-toggle";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import logoImage from "@assets/8bfed827-52ba-46fb-8296-0158062c5b28_1762612473771.jpg";
@@ -203,6 +204,8 @@ export default function Home() {
                 Testimonials
               </a>
               
+              <ThemeToggle />
+              
               {!isLoading && !isAuthenticated && (
                 <>
                   <Button variant="ghost" onClick={() => window.location.href = "/api/login"} data-testid="button-login">
@@ -291,6 +294,11 @@ export default function Home() {
                 >
                   Testimonials
                 </a>
+                
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <span className="text-sm text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
                 
                 {!isLoading && !isAuthenticated && (
                   <>

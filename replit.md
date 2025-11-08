@@ -2,262 +2,55 @@
 
 **Tagline**: Train. Test. Deploy custom AI personas in minutes.
 
-## Project Overview
+### Overview
 
-ForgeAI is a platform that lets anyone create, simulate, and publish custom AI personalities without real fine-tuning. Users enter their intent or few-shot examples, and the adaptive system builds a specialized persona prompt. Each trained model can be tested in a live chat sandbox and instantly deployed as a public API endpoint.
+ForgeAI is a platform designed to enable users to create, simulate, and publish custom AI personalities without the need for traditional fine-tuning. By simply entering intent descriptions or a few-shot examples, the system automatically builds a specialized persona prompt. These trained AI models can be tested in a live chat sandbox and instantly deployed as public API endpoints. The project aims to provide a fast, intuitive, and developer-friendly experience for creating and deploying AI personas, complete with features like API key management and usage analytics.
 
-## Architecture
+### User Preferences
 
-- **Frontend**: React + TypeScript with Wouter routing
-- **Backend**: Express.js with in-memory storage
-- **AI Integration**: Google Gemini API (gemini-2.5-flash) for chat completions
-- **Design System**: Tailwind CSS + Shadcn UI components
-- **State Management**: TanStack Query for data fetching
+I prefer clear and concise explanations. I value an iterative development approach, where changes are introduced incrementally. Please ask for confirmation before implementing any major architectural changes or introducing new dependencies.
 
-## Key Features
+### System Architecture
 
-### Core Functionality
-1. **Persona Creation**: Define AI personas through intent descriptions and few-shot examples
-2. **Adaptive Prompt Builder**: Automatically generates structured system prompts from user inputs
-3. **Live Chat Sandbox**: Test personas in real-time with conversation history and persistent sessions
-4. **API Deployment**: One-click publish to generate public API endpoints with secure authentication
-5. **API Key Management**: Generate, regenerate, and manage bcrypt-hashed access keys
-6. **Analytics Dashboard**: Track token usage, requests, and performance metrics
-7. **Premium Loading Animations**: Particle sphere animations with framer-motion for AI operations
+**UI/UX Decisions**:
+ForgeAI adopts a minimalist, Linear/Vercel-inspired developer dashboard design with a premium AI-tool aesthetic. Key design principles include:
+- Clean, scannable hierarchy with clear visual weight.
+- Developer-first user experience prioritizing speed and clarity.
+- **Typography**: Inter font for interface text and JetBrains Mono for code blocks.
+- Consistent spacing utilizing Tailwind's spacing scale.
+- Sidebar navigation with icon and label menu items.
+- Responsive grids for displaying persona libraries.
+- Code blocks with syntax highlighting and copy-to-clipboard functionality.
+- Beautiful empty states and loading skeletons.
+- Premium particle sphere loading animations for AI operations.
 
-### Data Models
+**Technical Implementations**:
+- **Frontend**: React with TypeScript and Wouter for routing.
+- **Backend**: Express.js, providing RESTful API endpoints for all CRUD operations.
+- **State Management**: TanStack Query is used for efficient data fetching and caching.
+- **Design System**: Tailwind CSS for styling, complemented by Shadcn UI components.
+- **Database**: PostgreSQL with Drizzle ORM for persistent data storage.
+- **Authentication**: Replit Auth blueprint integration for user authentication (OAuth with Google and Email/Password), including `users` and `sessions` tables.
+- **Security**: Bcrypt-hashed API keys, rate limiting (60 requests/minute), and `isAuthenticated` middleware for protected routes.
+- **Adaptive Prompt Engineering**: A core system that automatically generates structured system prompts from user inputs.
+- **Chat Management**: Chat message persistence with session management, markdown rendering using `react-markdown` and `remark-gfm`.
 
-- **Personas**: AI personality configurations with name, description, intent, examples, and system prompts
-- **API Keys**: Authentication tokens for accessing persona endpoints
-- **Analytics**: Usage metrics tracking requests and token consumption
-- **Chat Messages**: Conversation history for sandbox testing
+**Feature Specifications**:
+- **Persona Creation & Management**: Users can define, create, update, delete, publish, and unpublish AI personas.
+- **Live Chat Sandbox**: Real-time persona testing with conversation history and persistent sessions.
+- **API Deployment**: One-click deployment of personas as public API endpoints with secure authentication.
+- **API Key Management**: Generation, regeneration, and management of secure API keys.
+- **Analytics Dashboard**: Tracking of token usage, requests, and performance metrics.
+- **Loading Animations**: Integration of premium particle sphere animations with framer-motion for AI operations.
 
-## Technical Stack
+### External Dependencies
 
-### Frontend Components
-- Dashboard with persona library grid
-- Persona creation/edit forms with intent and example inputs
-- Chat sandbox with markdown rendering, persistent sessions, and message history
-- API deployment page with code examples and endpoint documentation
-- API key management with secure hashing, regeneration, and copy-to-clipboard
-- Analytics dashboard with metric cards and usage tables
-- Premium AI loading animations with particle sphere effects
-
-### Backend Architecture
-- RESTful API endpoints for CRUD operations
-- Google Gemini integration for chat completions
-- PostgreSQL database with Drizzle ORM
-- Bcrypt-hashed API keys with rate limiting (60 req/min)
-- Request validation using Zod schemas
-- Adaptive prompt engineering system
-- Chat message persistence with session management
-
-## API Endpoints
-
-### Personas
-- `GET /api/personas` - List all personas with stats
-- `GET /api/personas/:id` - Get specific persona
-- `POST /api/personas` - Create new persona
-- `PATCH /api/personas/:id` - Update persona
-- `DELETE /api/personas/:id` - Delete persona
-- `PATCH /api/personas/:id/publish` - Publish persona
-- `PATCH /api/personas/:id/unpublish` - Unpublish persona
-
-### Chat
-- `POST /api/chat` - Send message to persona in sandbox
-- `POST /api/v1/chat/:personaId` - Public API endpoint for deployed personas
-
-### API Keys
-- `GET /api/api-keys` - List all API keys
-- `POST /api/api-keys` - Generate new API key
-- `DELETE /api/api-keys/:id` - Delete API key
-
-## Design Guidelines
-
-ForgeAI follows a Linear/Vercel-inspired minimalist developer dashboard design with premium AI-tool aesthetics:
-
-- Clean, scannable hierarchy with clear visual weight
-- Developer-first UX prioritizing speed and clarity
-- Inter font for interface, JetBrains Mono for code
-- Consistent spacing using Tailwind's spacing scale
-- Sidebar navigation with icon + label menu items
-- Cards in responsive grids for persona library
-- Code blocks with syntax highlighting and copy buttons
-- Beautiful empty states and loading skeletons
-- Premium particle sphere loading animations for AI operations
-
-## Environment Variables
-
-- `GEMINI_API_KEY` - Google Gemini API key for chat completions
-
-## Development Status
-
-### Completed (Phase 1: Schema & Frontend)
-- ✅ Data schema definition for all models
-- ✅ Design system configuration (fonts, colors, spacing)
-- ✅ All React components and pages
-- ✅ Sidebar navigation and routing
-- ✅ Theme toggle (light/dark mode)
-- ✅ Beautiful loading and empty states
-- ✅ Responsive layouts
-
-### Completed (MVP + Enhancements)
-- ✅ Backend implementation with RESTful APIs
-- ✅ Gemini AI integration for chat completions
-- ✅ PostgreSQL database with complete data persistence
-- ✅ Bcrypt-hashed API keys with rate limiting
-- ✅ Analytics tracking with token usage
-- ✅ Complete CRUD operations for personas, API keys
-- ✅ Chat sandbox with markdown rendering and persistent sessions
-- ✅ API deployment and key management
-- ✅ Improved error handling with clear user messages
-- ✅ Premium AI loading animations with particle sphere effects
-
-## Recent Changes
-
-- **2025-11-08**: ✅ Added Profile/Logout to Dashboard Sidebar
-  - **Sidebar Footer Component**:
-    - User profile section displays avatar with initials fallback
-    - Shows user full name (firstName + lastName) or email
-    - Dropdown menu with "My Account" label
-    - "Home" link to navigate back to homepage
-    - "Log Out" button with destructive styling (red)
-  - **Logout Flow Improvements**:
-    - Client-side: Clears TanStack Query auth cache before redirect
-    - Server-side: POST /api/logout endpoint properly destroys session
-    - Clears session cookie and invalidates auth state
-    - Redirects to homepage after successful logout
-  - **UI Enhancements**:
-    - Avatar component with profile image or initials
-    - Hover states on user menu trigger
-    - Clean dropdown with icons for each action
-  - **Testing**: Complete E2E test confirms login → profile menu → logout → homepage flow
-  - **Button Style Updates**: "View Demo" button padding customization (pt/pb/pl/pr classes)
-
-- **2025-11-08**: ✅ Enhanced Hero Section with Futuristic Design & Animations
-  - **Typography Improvements**:
-    - Gradient text effects on multi-line headline (lg:text-7xl)
-    - Larger subtitle font (lg:text-2xl) for better readability
-    - Enhanced badge with border, primary background, and hover effects
-  - **Interactive Elements**:
-    - Improved CTA buttons with icons (Rocket, Zap) and shadow glow effects
-    - Feature pills with rounded backgrounds and icons (Check, Clock)
-  - **Futuristic Background Animations**:
-    - Floating gradient orbs with 8s/10s animation cycles
-    - Subtle grid pattern background overlay
-    - Animated gradient with pulsing opacity
-    - Central glow effect with pulse animation
-  - **Floating Cards Animation**:
-    - Three animated cards: AI Persona, API Ready, Analytics
-    - Independent floating animations (5-7s) with subtle rotation
-    - Shadow effects and smooth transitions
-  - **CSS Animations**: Added custom keyframes for float, gradient, pulse effects
-  - E2E tested: All visual enhancements, buttons, badges, and floating cards display correctly
-
-- **2025-11-08**: ✅ Updated ForgeAI Logo and Hero Section
-  - Replaced previous logo with new custom ForgeAI logo (8bfed827-52ba-46fb-8296-0158062c5b28_1762612473771.jpg)
-  - Updated logo locations: navigation bar, footer, and sidebar
-  - Logo import updated in home.tsx and app-sidebar.tsx
-  - Removed large logo element from hero section right column
-  - Logo sizes: 8x8px (nav/footer/sidebar)
-  - E2E tested: navigation and footer logos display correctly
-
-- **2025-11-08**: ✅ Implemented Complete Authentication System with Replit Auth
-  - **Backend Authentication**:
-    - Installed and configured Replit Auth blueprint (OAuth with Google + Email/Password)
-    - Added `users` and `sessions` tables to PostgreSQL schema
-    - Created `replitAuth.ts` middleware for OAuth flow and session management
-    - Implemented `isAuthenticated` middleware to protect all privileged routes
-    - Added auth routes: `/api/login`, `/api/logout`, `/api/auth/user`, `/api/callback`
-    - **Security Hardening**:
-      - All persona CRUD endpoints now require authentication
-      - All chat sandbox endpoints protected
-      - All API key management endpoints protected
-      - ReturnTo parameter sanitization prevents open redirect vulnerability
-      - Session cookie `secure` flag is environment-aware (false in dev, true in prod)
-  - **Frontend Authentication**:
-    - Created `useAuth` React hook for managing auth state (`user`, `isAuthenticated`, `isLoading`)
-    - Added `authUtils` for error handling and 401 redirect logic
-    - Updated homepage navigation with Login button and user dropdown menu
-    - User menu shows avatar, name, email, and logout option
-    - Trial section works without login (preview only)
-    - After login, trial data prefills persona form via query parameters
-  - **User Flow**:
-    - Unauthenticated users see Login button in navigation
-    - Trial section allows preview without authentication
-    - "Create Free Account" button redirects to `/api/login?returnTo=/personas/new?...`
-    - After OAuth completes, user redirected to persona form with prefilled trial data
-    - Protected dashboard pages check auth and redirect to login on 401
-    - Logout destroys session and redirects to homepage
-  - **Database Schema**:
-    - `users`: id, sub (Replit user ID), email, firstName, lastName, profileImageUrl
-    - `sessions`: PostgreSQL-backed express-session storage with 7-day TTL
-  - **E2E Testing**: Complete authentication flow tested successfully
-    - Unauthenticated trial preview ✓
-    - Login with returnTo parameter ✓
-    - Protected endpoint access ✓
-    - Query param prefilling ✓
-    - Logout flow ✓
-
-- **2025-11-08**: ✅ Built complete ForgeAI Homepage
-  - Modern, responsive landing page with Linear/Vercel aesthetic
-  - Fixed navigation bar with logo and menu links
-  - Hero section with compelling headline, dual CTAs, and animated persona cards
-  - Replaced detailed analytics mockup with clean persona card previews
-  - "Why ForgeAI" feature cards (No Fine-Tuning, Real-Time Testing, API-Ready)
-  - Feature comparison table (ForgeAI vs Manual Prompting)
-  - Interactive trial section for persona preview simulation
-  - Testimonials section with user quotes
-  - Comprehensive footer with quick links and social icons
-  - Smooth scrolling for hash link navigation
-  - Fully responsive design (desktop, tablet, mobile)
-  - Homepage at `/`, Dashboard at `/dashboard`
-  - All CTAs link to dashboard for user onboarding
-
-- **2025-11-08**: ✅ Simplified navigation structure
-  - Removed redundant "Personas" menu item from sidebar
-  - Dashboard is the main hub for all persona management
-  - Cleaner navigation: Dashboard, Analytics, API Keys
-  - Removed duplicate `/personas` route
-
-- **2025-11-08**: ✅ Added delete functionality to persona edit page
-  - Delete button with confirmation dialog in edit mode
-  - AlertDialog warns about permanent deletion and shows persona name
-  - **Fixed**: Added cascade delete constraints to analytics table (personaId and apiKeyId)
-  - Proper cascade deletion of all related data (API keys, analytics, chat messages)
-  - Success/error toast notifications with redirect to dashboard
-  - Destructive styling (red button) positioned on left side of form
-  - Safe deletion with explicit user confirmation required
-  - **Tested**: E2E test confirms DELETE returns 204, persona removed from dashboard
-
-- **2025-11-08**: ✅ Implemented clean AI thinking loader
-  - Replaced complex 3D particle system with simple, professional loading indicator
-  - **Design**: Three pulsing dots with "Thinking..." text - matches modern AI chat UX patterns (ChatGPT, Claude)
-  - **Animation**: Smooth framer-motion pulsing with sequential staggered delays (0.2s)
-  - **Styling**: Muted background, rounded corners, compact size aligned to assistant side
-  - **Performance**: Lightweight, fast rendering, works in all browsers without fallback complexity
-  - **Integration**: Appears on first and subsequent messages via AnimatePresence transitions
-  - **User Feedback**: Clean, minimal, professional appearance that doesn't overwhelm the chat
-  - **Tested**: E2E test confirmed loader appears correctly with smooth transitions
-
-- **2025-11-08**: Database persistence and security features
-  - Migrated from in-memory to PostgreSQL with Drizzle ORM
-  - Implemented bcrypt-hashed API keys with regeneration capability
-  - Added rate limiting at 60 requests/minute per API key
-  - Chat message persistence with localStorage session management
-  - Markdown rendering with react-markdown and remark-gfm
-  - Clear chat functionality maintains session continuity
-
-- **2025-11-08**: Switched from OpenAI to Google Gemini
-  - Replaced OpenAI integration with Gemini AI (gemini-2.5-flash model)
-  - Updated error handling for better user feedback
-  - Fixed persona form hydration bug for edit workflow
-  - Improved chat error messages to show specific quota/auth issues
-  - All MVP features complete and functional
-
-- **2025-11-08**: Initial MVP implementation complete
-  - Created all data models (Persona, ApiKey, Analytics, ChatMessage)
-  - Built complete UI with sidebar navigation
-  - Implemented all pages: Dashboard, Persona Form, Chat Sandbox, Deploy, API Keys, Analytics
-  - Backend APIs for CRUD operations, chat, analytics
-  - Configured design tokens for developer-focused aesthetic
+- **AI Integration**: Google Gemini API (`gemini-2.5-flash`) for chat completions.
+- **Database**: PostgreSQL.
+- **ORM**: Drizzle ORM.
+- **Authentication**: Replit Auth.
+- **Styling**: Tailwind CSS.
+- **UI Components**: Shadcn UI.
+- **State Management**: TanStack Query.
+- **Animation**: Framer Motion.
+- **Markdown Rendering**: `react-markdown` and `remark-gfm`.
