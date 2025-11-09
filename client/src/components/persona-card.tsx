@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings, Copy, Check } from "lucide-react";
+import { MessageSquare, Settings, Copy, Check, Rocket } from "lucide-react";
 import type { PersonaWithStats } from "@shared/schema";
 import { Link } from "wouter";
 import { useState } from "react";
@@ -86,6 +86,12 @@ export function PersonaCard({ persona }: PersonaCardProps) {
           <Link href={`/personas/${persona.id}/edit`}>
             <Settings className="w-4 h-4 mr-2" />
             Edit
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm" className="flex-1" data-testid={`button-deploy-${persona.id}`}>
+          <Link href={`/personas/${persona.id}/deploy`}>
+            <Rocket className="w-4 h-4 mr-2" />
+            Deploy
           </Link>
         </Button>
       </CardFooter>
