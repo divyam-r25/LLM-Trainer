@@ -1,4 +1,4 @@
-import { Home, Sparkles, BarChart3, Key, Settings, LogOut, User as UserIcon, Plus, MessageSquare } from "lucide-react";
+import { Home, Sparkles, BarChart3, Key, Settings, LogOut, User as UserIcon, Plus, MessageSquare, BookOpen } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -38,6 +38,11 @@ const menuItems = [
     title: "Create Persona",
     url: "/create",
     icon: Plus,
+  },
+  {
+    title: "Documentation",
+    url: "/documentation",
+    icon: BookOpen,
   },
   {
     title: "Analytics",

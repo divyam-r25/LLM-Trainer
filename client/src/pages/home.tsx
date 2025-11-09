@@ -372,47 +372,47 @@ export default function Home() {
         <div className="max-w-7xl mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column */}
-            <div className="space-y-8">
-              <div className="space-y-6 ml-[20px] mr-[20px] pl-[20px] pr-[20px]">
+            <div className="space-y-6 md:space-y-8">
+              <div className="space-y-4 md:space-y-6">
                 <Badge variant="secondary" className="w-fit border border-primary/20 bg-primary/5 hover-elevate" data-testid="badge-hero">
                   <Sparkles className="w-3 h-3 mr-1 text-primary" />
                   <span className="font-medium text-[#47a5c4]">No Fine-Tuning Required</span>
                 </Badge>
                 
-                <h1 className="text-5xl lg:text-7xl font-bold leading-tight" data-testid="text-hero-title">
-                  <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent text-center text-[60px]">Train.Test. Deploy</span>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight" data-testid="text-hero-title">
+                  <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">Train. Test. Deploy</span>
                   <br />
-                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-center text-[60px]">
+                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                     custom AI personas
                   </span>
                   <br />
-                  <span className="text-foreground text-[60px]">in minutes.</span>
+                  <span className="text-foreground">in minutes.</span>
                 </h1>
                 
-                <p className="lg:text-2xl text-muted-foreground max-w-xl text-[20px]" data-testid="text-hero-subtitle">
+                <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-muted-foreground max-w-xl" data-testid="text-hero-subtitle">
                   ForgeAI lets you build specialized AI assistants for your business or app - no fine-tuning required.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 pl-[10px] pr-[10px] ml-[15px] mr-[15px] mt-[10px] mb-[10px] pt-[10px] pb-[10px]">
-                <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow pt-[10px] pb-[10px] pl-[24px] pr-[24px]" onClick={handleGetStarted} data-testid="button-start-trial">
-                  <Rocket className="w-5 h-5 mr-2" />
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Button size="lg" className="text-base sm:text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow" onClick={handleGetStarted} data-testid="button-start-trial">
+                  <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Start Free Trial
-                  <ChevronRight className="w-5 h-5 ml-2" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                 </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2 pt-[10px] pb-[10px] pl-[20px] pr-[20px]" onClick={scrollToTrial} data-testid="button-view-demo">
-                  <Zap className="w-5 h-5 mr-2" />
+                <Button size="lg" variant="outline" className="text-base sm:text-lg border-2" onClick={scrollToTrial} data-testid="button-view-demo">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   View Demo
                 </Button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm ml-[20px] mr-[20px] pl-[10px] pr-[10px]">
-                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
-                  <Check className="w-4 h-4 text-primary" />
+              <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-primary shrink-0" />
                   <span className="font-medium">No credit card required</span>
                 </div>
-                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2">
-                  <Clock className="w-4 h-4 text-primary" />
+                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-primary shrink-0" />
                   <span className="font-medium">Deploy in 5 minutes</span>
                 </div>
               </div>

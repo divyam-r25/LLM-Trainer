@@ -13,6 +13,7 @@ import ChatSandbox from "@/pages/chat-sandbox";
 import PersonaDeploy from "@/pages/persona-deploy";
 import ApiKeys from "@/pages/api-keys";
 import Analytics from "@/pages/analytics";
+import Documentation from "@/pages/documentation";
 import CreatePersona from "@/pages/create-persona";
 import ChatPage from "@/pages/chat-page";
 
@@ -40,6 +41,7 @@ function DashboardLayout() {
               <Route path="/personas/:id/deploy" component={PersonaDeploy} />
               <Route path="/api-keys" component={ApiKeys} />
               <Route path="/analytics" component={Analytics} />
+              <Route path="/documentation" component={Documentation} />
               <Route path="/create" component={CreatePersona} />
               <Route path="/chat/:id" component={ChatPage} />
             </Switch>
@@ -59,6 +61,7 @@ function App() {
         <Route path="/personas/*" component={DashboardLayout} />
         <Route path="/api-keys" component={DashboardLayout} />
         <Route path="/analytics" component={DashboardLayout} />
+        <Route path="/documentation" component={DashboardLayout} />
         <Route path="/create" component={DashboardLayout} />
         <Route path="/chat/:id" component={DashboardLayout} />
         <Route component={NotFound} />
