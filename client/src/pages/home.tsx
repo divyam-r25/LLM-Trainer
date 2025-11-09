@@ -376,7 +376,7 @@ export default function Home() {
               <div className="space-y-6 ml-[20px] mr-[20px] pl-[20px] pr-[20px]">
                 <Badge variant="secondary" className="w-fit border border-primary/20 bg-primary/5 hover-elevate" data-testid="badge-hero">
                   <Sparkles className="w-3 h-3 mr-1 text-primary" />
-                  <span className="font-medium text-[#e2e4e9]">No Fine-Tuning Required</span>
+                  <span className="font-medium text-[#47a5c4]">No Fine-Tuning Required</span>
                 </Badge>
                 
                 <h1 className="text-5xl lg:text-7xl font-bold leading-tight" data-testid="text-hero-title">
