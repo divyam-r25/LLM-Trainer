@@ -79,25 +79,29 @@ export function PersonaCard({ persona }: PersonaCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col sm:flex-row gap-2 pt-3">
-        <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-test-${persona.id}`}>
-          <Link href={`/personas/${persona.id}/test`}>
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Test
-          </Link>
-        </Button>
-        <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-edit-${persona.id}`}>
-          <Link href={`/personas/${persona.id}/edit`}>
-            <Settings className="w-4 h-4 mr-2" />
-            Edit
-          </Link>
-        </Button>
-        <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-deploy-${persona.id}`}>
-          <Link href={`/personas/${persona.id}/deploy`}>
-            <Rocket className="w-4 h-4 mr-2" />
-            Deploy
-          </Link>
-        </Button>
+      <CardFooter className="flex flex-col gap-2 pt-3">
+        <div className="flex gap-2 w-full">
+          <Button asChild variant="outline" size="sm" className="flex-1" data-testid={`button-test-${persona.id}`}>
+            <Link href={`/personas/${persona.id}/test`}>
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Test
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="flex-1" data-testid={`button-edit-${persona.id}`}>
+            <Link href={`/personas/${persona.id}/edit`}>
+              <Settings className="w-4 h-4 mr-2" />
+              Edit
+            </Link>
+          </Button>
+        </div>
+        <div className="flex justify-center w-full">
+          <Button asChild variant="default" size="sm" className="w-[80%]" data-testid={`button-deploy-${persona.id}`}>
+            <Link href={`/personas/${persona.id}/deploy`}>
+              <Rocket className="w-4 h-4 mr-2" />
+              Deploy
+            </Link>
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
