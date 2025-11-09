@@ -26,77 +26,79 @@ export function PersonaCard({ persona }: PersonaCardProps) {
   };
 
   return (
-    <div id={`persona-card-${persona.id}`} className="persona-card">
-      <Card className="h-full flex flex-col hover-elevate transition-all persona-glow-subtle" data-testid={`card-persona-${persona.id}`}>
-        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold truncate" data-testid={`text-persona-name-${persona.id}`}>
-              {persona.name}
-            </CardTitle>
-            <CardDescription className="text-sm mt-1 line-clamp-2">
-              {persona.description}
-            </CardDescription>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <code className="text-xs font-mono bg-muted px-2 py-1 rounded text-muted-foreground truncate max-w-[200px]" data-testid={`text-persona-id-${persona.id}`}>
-                ID: {persona.id}
-              </code>
-              <button
-                onClick={copyPersonaId}
-                className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                title="Copy Persona ID"
-                data-testid={`button-copy-id-${persona.id}`}
-              >
-                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              </button>
+    <Card 
+      id={`persona-card-${persona.id}`} 
+      className="persona-card h-full flex flex-col hover-elevate transition-all persona-glow-subtle" 
+      data-testid={`card-persona-${persona.id}`}
+    >
+      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
+        <div className="flex-1 min-w-0">
+          <CardTitle className="text-lg font-semibold truncate" data-testid={`text-persona-name-${persona.id}`}>
+            {persona.name}
+          </CardTitle>
+          <CardDescription className="text-sm mt-1 line-clamp-2">
+            {persona.description}
+          </CardDescription>
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <code className="text-xs font-mono bg-muted px-2 py-1 rounded text-muted-foreground truncate max-w-[200px]" data-testid={`text-persona-id-${persona.id}`}>
+              ID: {persona.id}
+            </code>
+            <button
+              onClick={copyPersonaId}
+              className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              title="Copy Persona ID"
+              data-testid={`button-copy-id-${persona.id}`}
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </button>
+          </div>
+        </div>
+        <Badge variant={persona.isPublished ? "default" : "secondary"} className="shrink-0" data-testid={`badge-status-${persona.id}`}>
+          {persona.isPublished ? "Published" : "Draft"}
+        </Badge>
+      </CardHeader>
+      <CardContent className="pb-3 flex-1">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
+          <div>
+            <div className="text-muted-foreground text-xs">Requests</div>
+            <div className="font-mono font-medium mt-1 text-xs sm:text-sm" data-testid={`text-requests-${persona.id}`}>
+              {persona.totalRequests?.toLocaleString() || 0}
             </div>
           </div>
-          <Badge variant={persona.isPublished ? "default" : "secondary"} className="shrink-0" data-testid={`badge-status-${persona.id}`}>
-            {persona.isPublished ? "Published" : "Draft"}
-          </Badge>
-        </CardHeader>
-        <CardContent className="pb-3 flex-1">
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
-            <div>
-              <div className="text-muted-foreground text-xs">Requests</div>
-              <div className="font-mono font-medium mt-1 text-xs sm:text-sm" data-testid={`text-requests-${persona.id}`}>
-                {persona.totalRequests?.toLocaleString() || 0}
-              </div>
-            </div>
-            <div>
-              <div className="text-muted-foreground text-xs">Tokens</div>
-              <div className="font-mono font-medium mt-1 text-xs sm:text-sm" data-testid={`text-tokens-${persona.id}`}>
-                {persona.totalTokens?.toLocaleString() || 0}
-              </div>
-            </div>
-            <div>
-              <div className="text-muted-foreground text-xs">Version</div>
-              <div className="font-mono font-medium mt-1 text-xs sm:text-sm" data-testid={`text-version-${persona.id}`}>
-                v{persona.currentVersion}
-              </div>
+          <div>
+            <div className="text-muted-foreground text-xs">Tokens</div>
+            <div className="font-mono font-medium mt-1 text-xs sm:text-sm" data-testid={`text-tokens-${persona.id}`}>
+              {persona.totalTokens?.toLocaleString() || 0}
             </div>
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row gap-2 pt-3">
-          <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-test-${persona.id}`}>
-            <Link href={`/personas/${persona.id}/test`}>
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Test
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-edit-${persona.id}`}>
-            <Link href={`/personas/${persona.id}/edit`}>
-              <Settings className="w-4 h-4 mr-2" />
-              Edit
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-deploy-${persona.id}`}>
-            <Link href={`/personas/${persona.id}/deploy`}>
-              <Rocket className="w-4 h-4 mr-2" />
-              Deploy
-            </Link>
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          <div>
+            <div className="text-muted-foreground text-xs">Version</div>
+            <div className="font-mono font-medium mt-1 text-xs sm:text-sm" data-testid={`text-version-${persona.id}`}>
+              v{persona.currentVersion}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex flex-col sm:flex-row gap-2 pt-3">
+        <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-test-${persona.id}`}>
+          <Link href={`/personas/${persona.id}/test`}>
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Test
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-edit-${persona.id}`}>
+          <Link href={`/personas/${persona.id}/edit`}>
+            <Settings className="w-4 h-4 mr-2" />
+            Edit
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm" className="w-full sm:flex-1" data-testid={`button-deploy-${persona.id}`}>
+          <Link href={`/personas/${persona.id}/deploy`}>
+            <Rocket className="w-4 h-4 mr-2" />
+            Deploy
+          </Link>
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
