@@ -36,7 +36,7 @@ export function PersonaCard({ persona }: PersonaCardProps) {
             {persona.description}
           </CardDescription>
           <div className="flex items-center gap-2 mt-2">
-            <code className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded" data-testid={`text-persona-id-${persona.id}`}>
+            <code className="text-xs font-mono bg-muted px-2 py-1 rounded text-[#e6e8ed]" data-testid={`text-persona-id-${persona.id}`}>
               ID: {persona.id}
             </code>
             <button
