@@ -141,19 +141,19 @@ export default function ApiKeys() {
   const baseUrl = window.location.origin;
 
   const curlExample = `curl -X POST ${baseUrl}/api/v1/chat/YOUR_PERSONA_ID \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "apiKey": "YOUR_API_KEY",
     "message": "Hello, how can you help me?"
   }'`;
 
   const jsExample = `const response = await fetch('${baseUrl}/api/v1/chat/YOUR_PERSONA_ID', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer YOUR_API_KEY',
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
+    apiKey: 'YOUR_API_KEY',
     message: 'Hello, how can you help me?'
   })
 });
@@ -165,15 +165,12 @@ console.log(data.tokensUsed); // Tokens consumed`;
   const pythonExample = `import requests
 
 url = "${baseUrl}/api/v1/chat/YOUR_PERSONA_ID"
-headers = {
-    "Authorization": "Bearer YOUR_API_KEY",
-    "Content-Type": "application/json"
-}
 data = {
+    "apiKey": "YOUR_API_KEY",
     "message": "Hello, how can you help me?"
 }
 
-response = requests.post(url, json=data, headers=headers)
+response = requests.post(url, json=data)
 result = response.json()
 print(result["message"])
 print(f"Tokens used: {result['tokensUsed']}")`;
@@ -272,18 +269,13 @@ print(f"Tokens used: {result['tokensUsed']}")`;
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Authentication</h3>
-              <div className="p-4 rounded-md bg-muted border border-border">
-                <code className="text-sm font-mono">
-                  Authorization: Bearer YOUR_API_KEY
-                </code>
-              </div>
-            </div>
-
-            <div>
               <h3 className="font-semibold mb-2">Request Format</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                Include your API key and message in the request body:
+              </p>
               <CodeBlock
                 code={`{
+  "apiKey": "YOUR_API_KEY",
   "message": "Your message to the AI persona"
 }`}
                 language="json"

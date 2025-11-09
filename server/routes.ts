@@ -293,14 +293,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/v1/chat/:personaId", async (req, res) => {
     try {
       const { personaId } = req.params;
-      const { message } = req.body;
-      const authHeader = req.headers.authorization;
+      const { message, apiKey: plainTextKey } = req.body;
 
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ error: "Missing or invalid authorization header" });
+      if (!plainTextKey) {
+        return res.status(401).json({ error: "Missing apiKey in request body" });
       }
 
-      const plainTextKey = authHeader.substring(7);
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
       
       // Public API - For authentication, we need to check ALL keys (not filtered by userId)
       // because this is a public endpoint accessed via API key
@@ -352,10 +353,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const persona = personaResult;
-
-      if (!message) {
-        return res.status(400).json({ error: "Message is required" });
-      }
 
       const completion = await getChatCompletion({
         systemPrompt: persona.systemPrompt,

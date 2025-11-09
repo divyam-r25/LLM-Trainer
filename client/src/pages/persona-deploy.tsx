@@ -69,19 +69,19 @@ export default function PersonaDeploy() {
   const apiEndpoint = `${window.location.origin}/api/v1/chat/${persona.id}`;
 
   const curlExample = `curl -X POST ${apiEndpoint} \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
+    "apiKey": "YOUR_API_KEY",
     "message": "Hello, how can you help me?"
   }'`;
 
   const jsExample = `const response = await fetch('${apiEndpoint}', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer YOUR_API_KEY',
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
+    apiKey: 'YOUR_API_KEY',
     message: 'Hello, how can you help me?'
   })
 });
@@ -92,15 +92,12 @@ console.log(data.message);`;
   const pythonExample = `import requests
 
 url = "${apiEndpoint}"
-headers = {
-    "Authorization": "Bearer YOUR_API_KEY",
-    "Content-Type": "application/json"
-}
 data = {
+    "apiKey": "YOUR_API_KEY",
     "message": "Hello, how can you help me?"
 }
 
-response = requests.post(url, json=data, headers=headers)
+response = requests.post(url, json=data)
 result = response.json()
 print(result["message"])`;
 
