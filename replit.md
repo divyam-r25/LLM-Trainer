@@ -27,7 +27,7 @@ ForgeAI adopts a minimalist, Linear/Vercel-inspired developer dashboard design w
   - **Glowing Effects**: Personas feature subtle cyan/teal glowing animations
 - Consistent spacing utilizing Tailwind's spacing scale.
 - Sidebar navigation with icon and label menu items (dark blue-gray background with white text).
-- Responsive grids for displaying persona libraries.
+- **Responsive Design**: Fully responsive layouts using Tailwind breakpoints (sm, md, lg, xl) for optimal mobile, tablet, and desktop experiences.
 - Code blocks with syntax highlighting and copy-to-clipboard functionality.
 - Beautiful empty states and loading skeletons.
 - Premium particle sphere loading animations for AI operations.
@@ -37,8 +37,8 @@ ForgeAI adopts a minimalist, Linear/Vercel-inspired developer dashboard design w
 
 **Technical Implementations**:
 - **Frontend**: React with TypeScript and Wouter for routing.
-  - **Pages**: `create-persona.tsx`, `chat-page.tsx`, `persona-form.tsx`, `chat-sandbox.tsx`, `dashboard.tsx`, `api-keys.tsx`, `analytics.tsx`, `persona-deploy.tsx`, `home.tsx`
-  - **Routes**: Both standalone (`/create`, `/chat/:id`) and integrated (`/personas/*`) routes available
+  - **Pages**: `create-persona.tsx`, `chat-page.tsx`, `persona-form.tsx`, `chat-sandbox.tsx`, `dashboard.tsx`, `api-keys.tsx`, `analytics.tsx`, `persona-deploy.tsx`, `home.tsx`, `documentation.tsx`
+  - **Routes**: Both standalone (`/create`, `/chat/:id`) and integrated (`/personas/*`) routes available, plus dedicated `/documentation` route
 - **Backend**: Express.js, providing RESTful API endpoints for all CRUD operations.
   - **API Aliases**: `/api/trainers` routes as aliases for `/api/personas` endpoints for compatibility
 - **State Management**: TanStack Query is used for efficient data fetching and caching.
@@ -66,7 +66,11 @@ ForgeAI adopts a minimalist, Linear/Vercel-inspired developer dashboard design w
   - **Simple Authentication**: API key sent in JSON body (no Authorization header needed)
 - **API Key Management**: Generation, regeneration, and management of secure API keys.
   - **Persona ID Column**: API Keys table displays truncated persona IDs with copy buttons
-  - **Comprehensive Documentation**: Built-in API usage guide with cURL, JavaScript, and Python examples
+- **Comprehensive Documentation**: Dedicated documentation page with complete API usage guides
+  - **Code Examples**: cURL, JavaScript, and Python snippets with syntax highlighting
+  - **Framework Integration**: React, Express.js, and Flask examples
+  - **Error Handling**: Common error codes and solutions
+  - **Security Best Practices**: Key management and rate limiting guidance
 - **Analytics Dashboard**: Tracking of token usage, requests, and performance metrics.
 - **Loading Animations**: Integration of premium particle sphere animations with framer-motion for AI operations.
 
